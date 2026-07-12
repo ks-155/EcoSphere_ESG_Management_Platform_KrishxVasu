@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
-export default function Home() {
-  redirect("/dashboard/environmental");
+export default function DashboardPage() {
+  redirect("/settings/departments");
 }
