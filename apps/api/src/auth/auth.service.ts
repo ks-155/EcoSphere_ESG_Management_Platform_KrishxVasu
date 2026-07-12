@@ -27,7 +27,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    return this.generateTokens(user);
+    return this.formatAuthResponse(user);
   }
 
   async register(dto: RegisterDto) {
@@ -47,9 +47,10 @@ export class AuthService {
         password: hashedPassword,
         organizationId: dto.organizationId,
       },
+      include: { department: { select: { name: true } } },
     });
 
-    return this.generateTokens(user);
+    return this.formatAuthResponse(user);
   }
 
   async getProfile(userId: string) {
@@ -66,7 +67,7 @@ export class AuthService {
         organizationId: true,
         department: { select: { name: true, code: true } },
         ownedBadges: {
-          include: { badge: { select: { name: true, description: true, icon: true } } },
+          include: { badge: { select: { name: true, description: true, iconUrl: true } } },
           take: 10,
           orderBy: { awardedAt: 'desc' },
         },
@@ -77,10 +78,47 @@ export class AuthService {
       throw new UnauthorizedException('User not found');
     }
 
-    return user;
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      xp: user.xp,
+      avatar: user.avatar || null,
+      department: user.department?.name || null,
+      departmentId: user.departmentId || null,
+      organizationId: user.organizationId || null,
+      badges: user.ownedBadges.map(ub => ({
+        name: ub.badge.name,
+        description: ub.badge.description,
+        iconUrl: ub.badge.iconUrl,
+      })),
+    };
   }
 
-  private generateTokens(user: any) {
+  async refreshToken(refreshToken: string) {
+    try {
+      const payload = this.jwt.verify(refreshToken);
+      const user = await this.prisma.user.findUnique({
+        where: { id: payload.sub },
+        include: { department: { select: { name: true } } },
+      });
+
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+
+      return this.formatAuthResponse(user);
+    } catch {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+  }
+
+  async logout() {
+    return { success: true };
+  }
+
+  private formatAuthResponse(user: any) {
     const payload = { sub: user.id, email: user.email, role: user.role };
 
     return {
@@ -91,9 +129,11 @@ export class AuthService {
         email: user.email,
         name: user.name,
         role: user.role,
-        xp: user.xp,
-        avatar: user.avatar,
+        xp: user.xp || 0,
+        avatar: user.avatar || null,
         department: user.department?.name || null,
+        departmentId: user.departmentId || null,
+        organizationId: user.organizationId || null,
       },
     };
   }

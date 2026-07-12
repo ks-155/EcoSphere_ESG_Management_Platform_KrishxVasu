@@ -23,11 +23,33 @@ export class AuthController {
     return this.authService.register(dto);
   }
 
-  @Get('me')
+  @Post('logout')
+  @ApiOperation({ summary: 'Logout current user' })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  logout() {
+    return this.authService.logout();
+  }
+
+  @Post('refresh')
+  @ApiOperation({ summary: 'Refresh access token' })
+  refreshToken(@Body('refreshToken') refreshToken: string) {
+    return this.authService.refreshToken(refreshToken);
+  }
+
+  @Get('profile')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get current user profile' })
   getProfile(@CurrentUser('id') userId: string) {
+    return this.authService.getProfile(userId);
+  }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get current user profile (alias)' })
+  getMe(@CurrentUser('id') userId: string) {
     return this.authService.getProfile(userId);
   }
 }
