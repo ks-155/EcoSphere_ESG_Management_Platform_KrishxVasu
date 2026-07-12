@@ -4,6 +4,7 @@ import { ChallengesService } from './challenges.service';
 import { CreateChallengeDto } from './dto/create-challenge.dto';
 import { UpdateChallengeDto } from './dto/update-challenge.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -27,18 +28,22 @@ export class ChallengesController {
   findOne(@Param('id') id: string) { return this.service.findOne(id); }
 
   @Post()
-  @ApiOperation({ summary: 'Create challenge' })
+  @Roles('SUPER_ADMIN', 'ESG_MANAGER')
+  @ApiOperation({ summary: 'Create challenge (ESG Manager+)' })
   create(@Body() dto: CreateChallengeDto) { return this.service.create(dto); }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update challenge' })
+  @Roles('SUPER_ADMIN', 'ESG_MANAGER')
+  @ApiOperation({ summary: 'Update challenge (ESG Manager+)' })
   update(@Param('id') id: string, @Body() dto: UpdateChallengeDto) { return this.service.update(id, dto); }
 
   @Patch(':id/status')
-  @ApiOperation({ summary: 'Update challenge status' })
+  @Roles('SUPER_ADMIN', 'ESG_MANAGER', 'AUDITOR')
+  @ApiOperation({ summary: 'Update challenge status (ESG Manager+)' })
   updateStatus(@Param('id') id: string, @Body('status') status: string) { return this.service.updateStatus(id, status); }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete challenge' })
+  @Roles('SUPER_ADMIN')
+  @ApiOperation({ summary: 'Delete challenge (Admin only)' })
   remove(@Param('id') id: string) { return this.service.remove(id); }
 }

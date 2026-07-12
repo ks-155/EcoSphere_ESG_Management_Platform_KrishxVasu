@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Patch, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
 import { ComplianceIssuesService } from './compliance-issues.service';
 import { CreateComplianceIssueDto } from './dto/create-compliance-issue.dto';
 import { UpdateComplianceIssueDto } from './dto/update-compliance-issue.dto';
@@ -28,14 +29,17 @@ export class ComplianceIssuesController {
   findOne(@Param('id') id: string) { return this.service.findOne(id); }
 
   @Post()
-  @ApiOperation({ summary: 'Create compliance issue' })
+  @Roles('SUPER_ADMIN', 'ESG_MANAGER', 'AUDITOR')
+  @ApiOperation({ summary: 'Create compliance issue (Manager+)' })
   create(@Body() dto: CreateComplianceIssueDto) { return this.service.create(dto); }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update compliance issue' })
+  @Roles('SUPER_ADMIN', 'ESG_MANAGER', 'AUDITOR')
+  @ApiOperation({ summary: 'Update compliance issue (Manager+)' })
   update(@Param('id') id: string, @Body() dto: UpdateComplianceIssueDto) { return this.service.update(id, dto); }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete compliance issue' })
+  @Roles('SUPER_ADMIN', 'ESG_MANAGER')
+  @ApiOperation({ summary: 'Delete compliance issue (Manager+)' })
   remove(@Param('id') id: string) { return this.service.remove(id); }
 }

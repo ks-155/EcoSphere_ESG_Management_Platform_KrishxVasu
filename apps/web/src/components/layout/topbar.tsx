@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useAuthStore } from "@/store/auth-store";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -14,6 +15,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Menu, Bell, Search, LogOut, User, Settings } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { ThemeToggle } from "./theme-toggle";
+import { useNotifications, useUnreadCount, useMarkAllAsRead } from "@/lib/hooks/use-master-data";
 import { cn } from "@/lib/utils";
 
 interface TopbarProps {
@@ -27,6 +30,9 @@ export function Topbar({ onMenuClick }: TopbarProps) {
   const initials = user?.name
     ? user.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
     : "U";
+
+  const { data: unreadData } = useUnreadCount(user?.id || "");
+  const unreadCount = unreadData?.count || 0;
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background px-4 sm:px-6">
@@ -52,7 +58,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
         </div>
       </div>
 
-      <div className="flex items-center gap-2 ml-auto">
+      <div className="flex items-center gap-1 ml-auto">
         {/* Search toggle for mobile */}
         <Button
           variant="ghost"
@@ -63,11 +69,20 @@ export function Topbar({ onMenuClick }: TopbarProps) {
           <Search className="h-5 w-5" />
         </Button>
 
+        {/* Theme toggle */}
+        <ThemeToggle />
+
         {/* Notifications */}
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-5 w-5" />
-          <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-red-500" />
-        </Button>
+        <Link href="/notifications">
+          <Button variant="ghost" size="icon" className="relative">
+            <Bell className="h-5 w-5" />
+            {unreadCount > 0 && (
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-medium text-white">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
+            )}
+          </Button>
+        </Link>
 
         {/* User dropdown */}
         <DropdownMenu>
@@ -92,13 +107,17 @@ export function Topbar({ onMenuClick }: TopbarProps) {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <User className="mr-2 h-4 w-4" />
-              Profile
+            <DropdownMenuItem asChild>
+              <Link href="/profile">
+                <User className="mr-2 h-4 w-4" />
+                Profile
+              </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Settings className="mr-2 h-4 w-4" />
-              Settings
+            <DropdownMenuItem asChild>
+              <Link href="/settings/esg-config">
+                <Settings className="mr-2 h-4 w-4" />
+                Settings
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => logout()}>

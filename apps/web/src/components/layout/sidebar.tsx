@@ -38,6 +38,7 @@ import {
   Award,
   LayoutDashboard,
   Home,
+  CircleUser,
 } from "lucide-react";
 
 const navGroups = [
@@ -48,6 +49,12 @@ const navGroups = [
       { label: "Environmental", href: "/environmental", icon: Leaf },
       { label: "Social", href: "/social", icon: Users },
       { label: "Governance", href: "/governance", icon: Shield },
+    ],
+  },
+  {
+    label: "My Space",
+    items: [
+      { label: "Profile", href: "/profile", icon: CircleUser },
     ],
   },
   {

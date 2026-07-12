@@ -3,7 +3,7 @@
 import { PageHeader } from "@/components/shared";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Building2, Users, Leaf, Trophy, Award, BarChart3, Activity, Shield, Target, LogIn } from "lucide-react";
+import { Building2, Users, Leaf, Trophy, Award, BarChart3, Activity, Shield, Target, LogIn, Download } from "lucide-react";
 import { useDashboardOverview, useDashboardEnvironmental, useDashboardSocial, useDashboardGovernance, useDashboardLeaderboard } from "@/lib/hooks/use-master-data";
 import { useAuthStore } from "@/store/auth-store";
 import { Button } from "@/components/ui/button";
@@ -39,9 +39,98 @@ export default function DashboardPage() {
     );
   }
 
+  async function handleExportDashboard() {
+    const { jsPDF } = await import("jspdf");
+    const doc = new jsPDF();
+    let y = 15;
+
+    doc.setFontSize(20);
+    doc.text("EcoSphere ESG Dashboard", 14, y);
+    y += 10;
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Generated: ${new Date().toLocaleString()}`, 14, y);
+    y += 12;
+
+    doc.setFontSize(14);
+    doc.setTextColor(0);
+    doc.text("Overview KPIs", 14, y);
+    y += 8;
+    doc.setFontSize(10);
+    if (overview) {
+      for (const c of overviewCards) {
+        doc.text(`${c.label}: ${(overview as any)[c.key] ?? "-"}`, 14, y);
+        y += 5;
+      }
+      if (overview.overallESGScore != null) {
+        doc.text(`Overall ESG Score: ${overview.overallESGScore.toFixed(1)}%`, 14, y);
+        y += 5;
+      }
+    }
+    y += 8;
+
+    if (envData?.carbonByDepartment?.length) {
+      doc.setFontSize(14);
+      doc.text("Carbon by Department", 14, y);
+      y += 7;
+      doc.setFontSize(10);
+      for (const d of envData.carbonByDepartment) {
+        doc.text(`${d.departmentName}: ${d.totalCO2.toFixed(1)} kg`, 14, y);
+        y += 5;
+      }
+      y += 8;
+    }
+
+    if (socialData) {
+      doc.setFontSize(14);
+      doc.text("Social", 14, y);
+      y += 7;
+      doc.setFontSize(10);
+      doc.text(`CSR Activities: Total=${socialData.csrParticipationStats.total}, Approved=${socialData.csrParticipationStats.approved}, Pending=${socialData.csrParticipationStats.pending}`, 14, y);
+      y += 5;
+      doc.text(`Challenges: ${socialData.challengeCompletionStats.completed}/${socialData.challengeCompletionStats.total} completed`, 14, y);
+      y += 8;
+    }
+
+    if (govData) {
+      doc.setFontSize(14);
+      doc.text("Governance", 14, y);
+      y += 7;
+      doc.setFontSize(10);
+      doc.text(`Policy Acknowledgement Rate: ${(govData.policyAcknowledgementRate * 100).toFixed(0)}%`, 14, y);
+      y += 5;
+      for (const b of govData.complianceIssuesBySeverity) {
+        doc.text(`${b.severity} Issues: ${b._count}`, 14, y);
+        y += 5;
+      }
+      y += 8;
+    }
+
+    if (leaderboard?.length) {
+      doc.setFontSize(14);
+      doc.text("Leaderboard", 14, y);
+      y += 7;
+      doc.setFontSize(10);
+      for (const e of leaderboard) {
+        doc.text(`#${e.rank} ${e.name} - ${e.xp} XP (${e.badgeCount} badges)`, 14, y);
+        y += 5;
+      }
+    }
+
+    doc.save(`ecosphere-dashboard-${new Date().toISOString().slice(0, 10)}.pdf`);
+  }
+
   return (
     <>
-      <PageHeader title="Dashboard" description="ESG performance at a glance" />
+      <PageHeader
+        title="Dashboard"
+        description="ESG performance at a glance"
+        action={
+          <Button variant="outline" onClick={handleExportDashboard}>
+            <Download className="mr-2 h-4 w-4" /> Export PDF
+          </Button>
+        }
+      />
       <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
         {overviewCards.map((c) => {
           const Icon = iconMap[c.icon];

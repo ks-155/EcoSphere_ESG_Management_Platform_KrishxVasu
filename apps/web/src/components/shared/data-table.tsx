@@ -23,6 +23,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { SearchInput } from "./search-input";
+import { RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface DataTableProps<TData, TValue> {
@@ -74,13 +75,20 @@ export function DataTable<TData, TValue>({
     <div className="space-y-4">
       {/* Toolbar */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        {searchable && (
-          <SearchInput
-            value={globalFilter}
-            onChange={setGlobalFilter}
-            placeholder={searchPlaceholder}
-          />
-        )}
+        <div className="flex items-center gap-2">
+          {searchable && (
+            <SearchInput
+              value={globalFilter}
+              onChange={setGlobalFilter}
+              placeholder={searchPlaceholder}
+            />
+          )}
+          {globalFilter && (
+            <Button variant="ghost" size="sm" onClick={() => setGlobalFilter("")}>
+              <RotateCcw className="mr-1 h-3 w-3" /> Reset
+            </Button>
+          )}
+        </div>
         {toolbar && <div className="flex items-center gap-2">{toolbar}</div>}
       </div>
 

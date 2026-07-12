@@ -27,6 +27,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { OrganizationModule } from './modules/organization/organization.module';
 import { ReportsModule } from './modules/reports/reports.module';
+import { FileUploadModule } from './modules/file-upload/file-upload.module';
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { ReportsModule } from './modules/reports/reports.module';
     DepartmentScoresModule,
     DashboardModule,
     ReportsModule,
+    FileUploadModule,
   ],
 })
 export class AppModule {}
