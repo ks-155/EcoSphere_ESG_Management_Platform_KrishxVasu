@@ -11,23 +11,20 @@ export interface User {
   email: string;
   name: string;
   role: UserRole;
+  xp?: number;
+  avatar?: string;
+  department?: string | null;
   departmentId?: string;
-  departmentName?: string;
-  avatarUrl?: string;
-}
-
-export interface AuthTokens {
-  accessToken: string;
-  refreshToken: string;
+  organizationId?: string;
 }
 
 export interface LoginRequest {
   email: string;
   password: string;
-  rememberMe?: boolean;
 }
 
 export interface LoginResponse {
+  accessToken: string;
+  refreshToken: string;
   user: User;
-  tokens: AuthTokens;
 }
