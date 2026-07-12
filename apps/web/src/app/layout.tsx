@@ -19,9 +19,11 @@ export const metadata: Metadata = {
   },
   description:
     "Enterprise ESG management platform for tracking environmental, social, and governance metrics",
-  robots: { index: false, follow: false }, // Internal app — no indexing needed
+  icons: {
+    icon: "/favicon.svg",
+  },
+  robots: { index: false, follow: false },
   other: {
-    // Preconnect hints for faster resource loading
     "theme-color": "#ffffff",
   },
 };
