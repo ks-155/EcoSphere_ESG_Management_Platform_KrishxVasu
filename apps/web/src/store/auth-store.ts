@@ -2,15 +2,16 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { User, AuthTokens } from "@/types/auth";
+import type { User } from "@/types/auth";
 
 interface AuthState {
   user: User | null;
-  tokens: AuthTokens | null;
+  accessToken: string | null;
+  refreshToken: string | null;
   isAuthenticated: boolean;
-  setAuth: (user: User, tokens: AuthTokens) => void;
+  setAuth: (user: User, accessToken: string, refreshToken: string) => void;
   setUser: (user: User) => void;
-  setTokens: (tokens: AuthTokens) => void;
+  setTokens: (accessToken: string, refreshToken: string) => void;
   logout: () => void;
 }
 
@@ -18,20 +19,22 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       user: null,
-      tokens: null,
+      accessToken: null,
+      refreshToken: null,
       isAuthenticated: false,
-      setAuth: (user, tokens) =>
-        set({ user, tokens, isAuthenticated: true }),
+      setAuth: (user, accessToken, refreshToken) =>
+        set({ user, accessToken, refreshToken, isAuthenticated: true }),
       setUser: (user) => set({ user }),
-      setTokens: (tokens) => set({ tokens }),
+      setTokens: (accessToken, refreshToken) => set({ accessToken, refreshToken }),
       logout: () =>
-        set({ user: null, tokens: null, isAuthenticated: false }),
+        set({ user: null, accessToken: null, refreshToken: null, isAuthenticated: false }),
     }),
     {
       name: "ecosphere-auth",
       partialize: (state) => ({
         user: state.user,
-        tokens: state.tokens,
+        accessToken: state.accessToken,
+        refreshToken: state.refreshToken,
         isAuthenticated: state.isAuthenticated,
       }),
     }

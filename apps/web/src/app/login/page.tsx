@@ -14,7 +14,6 @@ export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -25,7 +24,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      await login({ email, password, rememberMe });
+      await login({ email, password });
       router.push("/dashboard/environmental");
     } catch (err: any) {
       setError(err?.response?.data?.message || "Invalid email or password");
@@ -59,7 +58,7 @@ export default function LoginPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="name@company.com"
+                placeholder="admin@ecosphere.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -107,8 +106,6 @@ export default function LoginPage() {
               <input
                 type="checkbox"
                 id="remember"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
                 className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
               />
               <Label htmlFor="remember" className="text-sm font-normal">

@@ -4,8 +4,7 @@ build/
 .env
 .env.local
 .env.*.local
-prisma/*.db
-prisma/dev.db
+**/prisma/*.db
 .turbo/
 .next/
 *.tsbuildinfo
