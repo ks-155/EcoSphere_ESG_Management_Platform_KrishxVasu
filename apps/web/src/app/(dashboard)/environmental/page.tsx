@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import {
   Plus,
@@ -11,11 +10,8 @@ import {
   Trash2,
   Download,
   Search,
-  Target,
   HelpCircle,
 } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { dashboardApi } from "@/lib/api/dashboard";
 import { cn } from "@/lib/utils";
 
 const subTabs = [

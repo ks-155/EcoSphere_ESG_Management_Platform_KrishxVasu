@@ -2,15 +2,11 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import {
   TrendingUp,
   TrendingDown,
   Activity,
-  CheckCircle2,
-  AlertCircle,
-  Cloud,
   LogIn,
   Plus,
   Swords,
@@ -18,6 +14,7 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 import { useAuthStore } from "@/store/auth-store";
+import { cn } from "@/lib/utils";
 import {
   useDashboardOverview,
   useDashboardEnvironmental,
@@ -303,8 +300,4 @@ export default function DashboardPage() {
       </div>
     </div>
   );
-}
-
-function cn(...classes: (string | boolean | undefined)[]) {
-  return classes.filter(Boolean).join(" ");
 }

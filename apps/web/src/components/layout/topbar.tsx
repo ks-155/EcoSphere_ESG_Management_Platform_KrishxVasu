@@ -23,13 +23,13 @@ interface TopbarProps {
 }
 
 const moduleNav = [
-  { label: "Dashboard", href: "/dashboard" },
-  { label: "Environmental", href: "/environmental" },
-  { label: "Social", href: "/social" },
-  { label: "Governance", href: "/governance" },
-  { label: "Gamification", href: "/gamification" },
-  { label: "Reports", href: "/reports/custom" },
-  { label: "Settings", href: "/settings/departments" },
+  { label: "Dashboard", href: "/dashboard", match: ["/dashboard"] },
+  { label: "Environmental", href: "/environmental", match: ["/environmental", "/carbon", "/settings/emission-factors", "/settings/product-profiles", "/settings/goals"] },
+  { label: "Social", href: "/social", match: ["/social", "/csr"] },
+  { label: "Governance", href: "/governance", match: ["/governance", "/audits", "/settings/policies", "/settings/policy-acknowledgements"] },
+  { label: "Gamification", href: "/gamification", match: ["/gamification", "/challenges"] },
+  { label: "Reports", href: "/reports/custom", match: ["/reports"] },
+  { label: "Settings", href: "/settings/departments", match: ["/settings/departments", "/settings/categories", "/settings/esg-config", "/notifications", "/profile"] },
 ];
 
 export function Topbar({ onMenuClick }: TopbarProps) {
@@ -42,7 +42,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
     : "U";
 
   const activeModule = moduleNav.find((m) =>
-    pathname === m.href || pathname.startsWith(m.href.split("?")[0])
+    m.match.some((prefix) => pathname === prefix || pathname.startsWith(prefix + "/"))
   )?.href ?? "/dashboard";
 
   return (
