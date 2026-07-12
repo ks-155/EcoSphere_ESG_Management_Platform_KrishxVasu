@@ -1,9 +1,12 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, Query } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiQuery } from '@nestjs/swagger';
+import { Controller, Get, Post, Patch, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { EmissionFactorsService } from './emission-factors.service';
 import { CreateEmissionFactorDto } from './dto/create-emission-factor.dto';
 import { UpdateEmissionFactorDto } from './dto/update-emission-factor.dto';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 @ApiTags('Emission Factors')
 @Controller('/api/emission-factors')
 export class EmissionFactorsController {
