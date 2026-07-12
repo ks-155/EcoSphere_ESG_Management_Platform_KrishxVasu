@@ -40,13 +40,25 @@ export class AuthService {
     }
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);
+
+    let organizationId = dto.organizationId;
+    if (!organizationId) {
+      const org = await this.prisma.organization.findFirst();
+      if (org) organizationId = org.id;
+    }
+
+    const userData: any = {
+      email: dto.email,
+      name: dto.name,
+      password: hashedPassword,
+      organizationId,
+    };
+
+    if (dto.role) userData.role = dto.role;
+    if (dto.departmentId) userData.departmentId = dto.departmentId;
+
     const user = await this.prisma.user.create({
-      data: {
-        email: dto.email,
-        name: dto.name,
-        password: hashedPassword,
-        organizationId: dto.organizationId,
-      },
+      data: userData,
       include: { department: { select: { name: true } } },
     });
 

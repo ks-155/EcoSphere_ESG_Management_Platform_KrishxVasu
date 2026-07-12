@@ -23,7 +23,7 @@ export class PolicyAcknowledgementsService {
     const total = await this.prisma.policyAcknowledgement.count({ where });
     const orderBy: any = {};
     if (sortBy === 'acceptedAt') orderBy.acceptedAt = sortOrder;
-    else orderBy.createdAt = sortOrder;
+    else orderBy.acceptedAt = sortOrder;
 
     const items = await this.prisma.policyAcknowledgement.findMany({
       where,

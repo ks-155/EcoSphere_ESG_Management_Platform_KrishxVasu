@@ -28,9 +28,10 @@ export class CreateRewardDto {
   @Min(0)
   stock?: number;
 
-  @ApiProperty({ enum: ['ENVIRONMENTAL', 'SOCIAL', 'GOVERNANCE', 'GENERAL'] })
+  @ApiPropertyOptional({ enum: ['ENVIRONMENTAL', 'SOCIAL', 'GOVERNANCE', 'GENERAL'], default: 'GENERAL' })
+  @IsOptional()
   @IsEnum(['ENVIRONMENTAL', 'SOCIAL', 'GOVERNANCE', 'GENERAL'] as const)
-  category: string;
+  category?: string;
 
   @ApiPropertyOptional({ default: true })
   @IsOptional()

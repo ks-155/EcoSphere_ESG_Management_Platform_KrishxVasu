@@ -12,13 +12,15 @@ export class CreateCsrActivityDto {
   @IsString()
   description?: string;
 
-  @ApiProperty({ example: 'clxxxxxx' })
+  @ApiPropertyOptional({ example: 'clxxxxxx' })
+  @IsOptional()
   @IsString()
-  categoryId: string;
+  categoryId?: string;
 
-  @ApiProperty({ example: '2026-07-15T09:00:00.000Z' })
+  @ApiPropertyOptional({ example: '2026-07-15T09:00:00.000Z' })
+  @IsOptional()
   @IsDateString()
-  date: string;
+  date?: string;
 
   @ApiPropertyOptional({ default: true })
   @IsOptional()

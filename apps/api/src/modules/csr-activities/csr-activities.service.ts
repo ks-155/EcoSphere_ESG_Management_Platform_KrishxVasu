@@ -44,7 +44,14 @@ export class CsrActivitiesService {
   }
 
   async create(dto: CreateCsrActivityDto) {
-    return this.prisma.csrActivity.create({ data: dto as any });
+    const data: any = { ...dto };
+    if (dto.date) data.date = new Date(dto.date);
+    else data.date = new Date();
+    if (!dto.categoryId) {
+      const cat = await this.prisma.category.findFirst({ where: { type: 'CSR_ACTIVITY' } });
+      if (cat) data.categoryId = cat.id;
+    }
+    return this.prisma.csrActivity.create({ data });
   }
 
   async update(id: string, dto: UpdateCsrActivityDto) {
