@@ -56,7 +56,7 @@ const formFields = [
   { name: "effectiveDate", label: "Effective Date", type: "date" as const, required: true },
 ];
 
-const policyStatusVariants: Record<string, "default" | "secondary" | "warning" | "destructive"> = {
+const policyStatusVariants: Record<string, "default" | "secondary" | "success" | "warning" | "destructive"> = {
   ACTIVE: "success",
   DRAFT: "warning",
   ARCHIVED: "secondary",

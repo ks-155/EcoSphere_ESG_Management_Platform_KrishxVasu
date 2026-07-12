@@ -74,7 +74,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-8 gap-2 pl-2 pr-2">
               <Avatar className="h-7 w-7">
-                {user?.avatarUrl && <AvatarImage src={user.avatarUrl} />}
+                {user?.avatar && <AvatarImage src={user.avatar} />}
                 <AvatarFallback className="text-xs">{initials}</AvatarFallback>
               </Avatar>
               <span className="hidden text-sm font-medium md:inline-block">
