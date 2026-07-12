@@ -1,5 +1,5 @@
-import { IsEmail, IsString, MinLength } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail, IsString, IsOptional, MinLength } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class RegisterDto {
   @ApiProperty({ example: 'user@ecosphere.com' })
@@ -16,7 +16,23 @@ export class RegisterDto {
   @MinLength(6)
   password: string;
 
-  @ApiProperty({ example: 'org-id' })
+  @ApiPropertyOptional({ example: 'org-id' })
+  @IsOptional()
   @IsString()
-  organizationId: string;
+  organizationId?: string;
+
+  @ApiPropertyOptional({ example: 'VIEWER', enum: ['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'VIEWER'] })
+  @IsOptional()
+  @IsString()
+  role?: string;
+
+  @ApiPropertyOptional({ example: 'dept-id' })
+  @IsOptional()
+  @IsString()
+  departmentId?: string;
+
+  @ApiPropertyOptional({ example: 'IT' })
+  @IsOptional()
+  @IsString()
+  department?: string;
 }

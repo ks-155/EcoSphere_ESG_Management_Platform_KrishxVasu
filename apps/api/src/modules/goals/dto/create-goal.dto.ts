@@ -32,20 +32,23 @@ export class CreateGoalDto {
   @MinLength(1)
   unit: string;
 
-  @ApiProperty({ example: '2025-12-31' })
+  @ApiPropertyOptional({ example: '2025-12-31' })
+  @IsOptional()
   @IsDateString()
-  deadline: string;
+  deadline?: string;
 
-  @ApiProperty({ enum: ['NOT_STARTED', 'IN_PROGRESS', 'ACHIEVED', 'CANCELLED'] })
+  @ApiPropertyOptional({ enum: ['NOT_STARTED', 'IN_PROGRESS', 'ACHIEVED', 'CANCELLED'], default: 'NOT_STARTED' })
+  @IsOptional()
   @IsEnum(['NOT_STARTED', 'IN_PROGRESS', 'ACHIEVED', 'CANCELLED'] as const)
-  status: string;
+  status?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   departmentId?: string;
 
-  @ApiProperty({ enum: ['QUARTERLY', 'ANNUAL', 'MULTI_YEAR'] })
+  @ApiPropertyOptional({ enum: ['QUARTERLY', 'ANNUAL', 'MULTI_YEAR'], default: 'ANNUAL' })
+  @IsOptional()
   @IsEnum(['QUARTERLY', 'ANNUAL', 'MULTI_YEAR'] as const)
-  timeframe: string;
+  timeframe?: string;
 }

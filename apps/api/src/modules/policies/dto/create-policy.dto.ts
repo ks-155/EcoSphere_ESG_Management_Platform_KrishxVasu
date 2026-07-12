@@ -12,9 +12,10 @@ export class CreatePolicyDto {
   @IsString()
   description?: string;
 
-  @ApiProperty({ enum: ['ENVIRONMENTAL', 'SOCIAL', 'GOVERNANCE', 'GENERAL'] })
+  @ApiPropertyOptional({ enum: ['ENVIRONMENTAL', 'SOCIAL', 'GOVERNANCE', 'GENERAL'], default: 'GENERAL' })
+  @IsOptional()
   @IsEnum(['ENVIRONMENTAL', 'SOCIAL', 'GOVERNANCE', 'GENERAL'] as const)
-  category: string;
+  category?: string;
 
   @ApiProperty({ example: 'We are committed to reducing our environmental impact.' })
   @IsString()
@@ -26,13 +27,15 @@ export class CreatePolicyDto {
   @IsString()
   version?: string;
 
-  @ApiProperty({ enum: ['DRAFT', 'ACTIVE', 'ARCHIVED'] })
+  @ApiPropertyOptional({ enum: ['DRAFT', 'ACTIVE', 'ARCHIVED'], default: 'DRAFT' })
+  @IsOptional()
   @IsEnum(['DRAFT', 'ACTIVE', 'ARCHIVED'] as const)
-  status: string;
+  status?: string;
 
-  @ApiProperty({ example: '2024-01-01' })
+  @ApiPropertyOptional({ example: '2024-01-01' })
+  @IsOptional()
   @IsDateString()
-  effectiveDate: string;
+  effectiveDate?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
