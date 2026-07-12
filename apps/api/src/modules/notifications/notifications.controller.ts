@@ -12,6 +12,12 @@ import { UpdateNotificationDto } from './dto/update-notification.dto';
 export class NotificationsController {
   constructor(private readonly service: NotificationsService) {}
 
+  @Get()
+  @ApiOperation({ summary: 'List all notifications' })
+  findAll() {
+    return this.service.findAll();
+  }
+
   @Get('user/:userId')
   @ApiOperation({ summary: 'List notifications by user' })
   @ApiQuery({ name: 'isRead', required: false })

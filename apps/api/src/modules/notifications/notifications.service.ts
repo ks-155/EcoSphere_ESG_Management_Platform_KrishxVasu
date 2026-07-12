@@ -9,6 +9,10 @@ import { parseQuery } from '../../common/helpers/query.helper';
 export class NotificationsService {
   constructor(private prisma: PrismaService) {}
 
+  async findAll() {
+    return this.prisma.notification.findMany({ orderBy: { createdAt: 'desc' } });
+  }
+
   async findAllByUser(userId: string, query: any): Promise<PaginatedResponse<any>> {
     const { page, limit, sortBy, sortOrder } = parseQuery(query);
     const { isRead, type } = query;

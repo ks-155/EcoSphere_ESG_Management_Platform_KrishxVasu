@@ -25,6 +25,7 @@ import { CsrActivitiesModule } from './modules/csr-activities/csr-activities.mod
 import { EmployeeParticipationsModule } from './modules/employee-participations/employee-participations.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { OrganizationModule } from './modules/organization/organization.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
     EventEmitterModule.forRoot(),
     PrismaModule,
     AuthModule,
+    OrganizationModule,
     CarbonTransactionsModule,
     CsrActivitiesModule,
     EmployeeParticipationsModule,

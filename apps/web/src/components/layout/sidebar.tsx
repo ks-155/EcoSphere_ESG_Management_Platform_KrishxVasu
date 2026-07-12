@@ -6,7 +6,6 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
-  LayoutDashboard,
   Leaf,
   Users,
   Shield,
@@ -24,7 +23,6 @@ import {
   BarChart3,
   TreePine,
   ScrollText,
-  Award,
   ChevronLeft,
   ChevronRight,
   Activity,
@@ -37,15 +35,19 @@ import {
   Handshake,
   Calculator,
   TicketCheck,
-  GitPullRequest,
+  Award,
+  LayoutDashboard,
+  Home,
 } from "lucide-react";
-import { useState } from "react";
 
 const navGroups = [
   {
     label: "Dashboard",
     items: [
       { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
+      { label: "Environmental", href: "/environmental", icon: Leaf },
+      { label: "Social", href: "/social", icon: Users },
+      { label: "Governance", href: "/governance", icon: Shield },
     ],
   },
   {
@@ -73,7 +75,6 @@ const navGroups = [
       { label: "CSR Participation", href: "/csr/participation", icon: Handshake },
       { label: "Challenge Templates", href: "/challenges/templates", icon: Swords },
       { label: "Submissions", href: "/challenges/submissions", icon: ScrollText },
-      { label: "Leaderboard", href: "/gamification/leaderboard", icon: Trophy },
     ],
   },
   {
@@ -93,15 +94,18 @@ const navGroups = [
   {
     label: "Gamification",
     items: [
+      { label: "Hub", href: "/gamification", icon: Trophy },
       { label: "Badges", href: "/gamification/badges", icon: Medal },
       { label: "User Badges", href: "/gamification/user-badges", icon: Award },
       { label: "Rewards", href: "/gamification/rewards", icon: Gift },
       { label: "Redemptions", href: "/gamification/redemptions", icon: TicketCheck },
+      { label: "Leaderboard", href: "/gamification/leaderboard", icon: BarChart3 },
     ],
   },
   {
     label: "Settings",
     items: [
+      { label: "ESG Config", href: "/settings/esg-config", icon: Settings2 },
       { label: "Policy Acknowledgements", href: "/settings/policy-acknowledgements", icon: FileText },
       { label: "Notifications", href: "/notifications", icon: Bell },
     ],
@@ -154,7 +158,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                 const Icon = item.icon;
                 const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
                 return (
-                  <li key={item.href}>
+                  <li key={`${group.label}-${item.label}`}>
                     <Link
                       href={item.href}
                       className={cn(
