@@ -3,8 +3,11 @@
 import { PageHeader } from "@/components/shared";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Building2, Users, Leaf, Trophy, Award, BarChart3, Activity, Shield, Target } from "lucide-react";
+import { Building2, Users, Leaf, Trophy, Award, BarChart3, Activity, Shield, Target, LogIn } from "lucide-react";
 import { useDashboardOverview, useDashboardEnvironmental, useDashboardSocial, useDashboardGovernance, useDashboardLeaderboard } from "@/lib/hooks/use-master-data";
+import { useAuthStore } from "@/store/auth-store";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 const iconMap: Record<string, any> = { Building2, Users, Leaf, Trophy, Award, BarChart3, Activity };
 
@@ -18,11 +21,23 @@ const overviewCards = [
 ];
 
 export default function DashboardPage() {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const { data: overview } = useDashboardOverview();
   const { data: envData } = useDashboardEnvironmental();
   const { data: socialData } = useDashboardSocial();
   const { data: govData } = useDashboardGovernance();
   const { data: leaderboard } = useDashboardLeaderboard(5);
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20">
+        <LogIn className="mb-4 h-12 w-12 text-muted-foreground" />
+        <h2 className="mb-2 text-xl font-semibold">Welcome to EcoSphere ESG</h2>
+        <p className="mb-6 text-muted-foreground">Please log in to view the dashboard.</p>
+        <Link href="/login"><Button>Go to Login</Button></Link>
+      </div>
+    );
+  }
 
   return (
     <>

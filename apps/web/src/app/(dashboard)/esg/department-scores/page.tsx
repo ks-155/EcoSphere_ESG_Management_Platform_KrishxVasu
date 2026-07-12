@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { PageHeader } from "@/components/shared";
 import { DataTable } from "@/components/shared";
 import { Button } from "@/components/ui/button";
@@ -8,15 +8,21 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Calculator, Plus } from "lucide-react";
+import { Calculator, LogIn } from "lucide-react";
 import { useDepartmentScores, useCalculateScore } from "@/lib/hooks/use-master-data";
+import { useAuthStore } from "@/store/auth-store";
 import type { ColumnDef } from "@tanstack/react-table";
-import { useMemo } from "react";
 import type { DepartmentScore } from "@/types/master-data";
+import Link from "next/link";
 
 export default function DepartmentScoresPage() {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const { data, isLoading } = useDepartmentScores();
   const calcMutation = useCalculateScore();
+
+  if (!isAuthenticated) {
+    return <div className="flex flex-col items-center justify-center py-20"><LogIn className="mb-4 h-12 w-12 text-muted-foreground" /><h2 className="mb-2 text-xl font-semibold">Please log in</h2><Link href="/login"><Button>Go to Login</Button></Link></div>;
+  }
   const [calcOpen, setCalcOpen] = useState(false);
   const [calcForm, setCalcForm] = useState({ departmentId: "", periodStart: "", periodEnd: "" });
 
