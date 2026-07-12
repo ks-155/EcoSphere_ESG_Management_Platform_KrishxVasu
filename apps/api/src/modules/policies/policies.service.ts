@@ -34,7 +34,12 @@ export class PoliciesService {
 
   async create(dto: CreatePolicyDto) {
     return this.prisma.esgPolicy.create({
-      data: { ...dto, effectiveDate: new Date(dto.effectiveDate) } as any,
+      data: {
+        ...dto,
+        category: dto.category ?? 'GENERAL',
+        status: dto.status ?? 'DRAFT',
+        effectiveDate: dto.effectiveDate ? new Date(dto.effectiveDate) : new Date(),
+      } as any,
     });
   }
 

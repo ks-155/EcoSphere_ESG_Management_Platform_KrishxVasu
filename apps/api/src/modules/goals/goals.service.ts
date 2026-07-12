@@ -33,7 +33,13 @@ export class GoalsService {
 
   async create(dto: CreateGoalDto) {
     return this.prisma.environmentalGoal.create({
-      data: { ...dto, deadline: new Date(dto.deadline), currentValue: dto.currentValue ?? 0 } as any,
+      data: {
+        ...dto,
+        deadline: dto.deadline ? new Date(dto.deadline) : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+        currentValue: dto.currentValue ?? 0,
+        status: dto.status ?? 'NOT_STARTED',
+        timeframe: dto.timeframe ?? 'ANNUAL',
+      } as any,
     });
   }
 
