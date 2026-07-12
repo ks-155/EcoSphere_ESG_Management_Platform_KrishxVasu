@@ -15,23 +15,9 @@ enum Role {
   AUDITOR
 }
 
-enum Status {
-  ACTIVE
-  INACTIVE
-}
-
 enum CategoryType {
   CSR_ACTIVITY
   CHALLENGE
-}
-
-enum SourceType {
-  FUEL
-  ELECTRICITY
-  GAS
-  WATER
-  WASTE
-  OTHER
 }
 
 enum ApprovalStatus {
@@ -83,6 +69,67 @@ enum NotificationType {
   REWARD_REDEEMED
 }
 
+enum EmissionUnit {
+  KG
+  TONNE
+  LITER
+  KWH
+  MWH
+}
+
+enum ProductCategory {
+  ELECTRONICS
+  FOOD
+  TEXTILE
+  PACKAGING
+  CHEMICAL
+  OTHER
+}
+
+enum GoalType {
+  ENVIRONMENTAL
+  SOCIAL
+  GOVERNANCE
+}
+
+enum GoalStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  ACHIEVED
+  CANCELLED
+}
+
+enum GoalTimeframe {
+  QUARTERLY
+  ANNUAL
+  MULTI_YEAR
+}
+
+enum PolicyStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum ComplianceStatus {
+  COMPLIANT
+  NON_COMPLIANT
+  PENDING
+}
+
+enum BadgeCategory {
+  ENVIRONMENTAL
+  SOCIAL
+  GOVERNANCE
+  GENERAL
+}
+
+enum UnlockType {
+  XP_THRESHOLD
+  CHALLENGE_COUNT
+  MANUAL
+}
+
 model Organization {
   id               String   @id @default(cuid())
   name             String
@@ -116,7 +163,6 @@ model User {
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
 
-  headedDepartments Department[]            @relation("DepartmentHead")
   participations    EmployeeParticipation[]
   challengePartics  ChallengeParticipation[]
   policyAcks        PolicyAcknowledgement[]
@@ -130,14 +176,14 @@ model Department {
   id             String       @id @default(cuid())
   name           String
   code           String       @unique
-  headId         String?
+  description    String?
+  headName       String?
   employeeCount  Int          @default(0)
-  status         Status       @default(ACTIVE)
+  status         Boolean      @default(true)
   organizationId String
   parentId       String?
   parent         Department?  @relation("DeptHierarchy", fields: [parentId], references: [id])
   children       Department[] @relation("DeptHierarchy")
-  head           User?        @relation("DepartmentHead", fields: [headId], references: [id])
   organization   Organization @relation(fields: [organizationId], references: [id])
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
@@ -148,76 +194,93 @@ model Department {
 }
 
 model Category {
-  id        String       @id @default(cuid())
-  name      String
-  type      CategoryType
-  status    Status       @default(ACTIVE)
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
+  id          String       @id @default(cuid())
+  name        String
+  description String?
+  type        CategoryType
+  status      Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 
   csrActivities CsrActivity[]
   challenges    Challenge[]
 }
 
 model EmissionFactor {
-  id          String     @id @default(cuid())
-  name        String
-  sourceType  SourceType
-  unit        String
-  factorValue Float
-  status      Status     @default(ACTIVE)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  id        String       @id @default(cuid())
+  name      String
+  category  String
+  value     Float
+  unit      EmissionUnit
+  source    String?
+  validFrom DateTime
+  validTo   DateTime?
+  status    Boolean      @default(true)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
 
   carbonTransactions CarbonTransaction[]
 }
 
 model ProductProfile {
-  id            String   @id @default(cuid())
-  productName   String
-  productCode   String   @unique
-  carbonScore   Float?
-  packagingType String?
-  recyclability Int?
-  energyRating  String?
-  status        Status   @default(ACTIVE)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id               String           @id @default(cuid())
+  name             String
+  sku              String           @unique
+  category         ProductCategory  @default(OTHER)
+  carbonFootprint  Float?
+  waterUsage       Float?
+  recyclable       Boolean          @default(false)
+  complianceStatus ComplianceStatus @default(PENDING)
+  description      String?
+  status           Boolean          @default(true)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
 }
 
 model EnvironmentalGoal {
-  id           String   @id @default(cuid())
-  title        String
-  targetType   String
+  id           String        @id @default(cuid())
+  name         String
+  description  String?
+  type         GoalType      @default(ENVIRONMENTAL)
   targetValue  Float
-  currentValue Float    @default(0)
+  currentValue Float         @default(0)
+  unit         String
   deadline     DateTime
-  status       Status   @default(ACTIVE)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  status       GoalStatus    @default(NOT_STARTED)
+  departmentId String?
+  timeframe    GoalTimeframe @default(ANNUAL)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 }
 
 model EsgPolicy {
-  id           String                @id @default(cuid())
-  title        String
-  description  String
-  category     String
-  status       Status                @default(ACTIVE)
-  createdAt    DateTime              @default(now())
-  updatedAt    DateTime              @updatedAt
+  id            String       @id @default(cuid())
+  title         String
+  description   String?
+  category      String       @default("GENERAL")
+  content       String
+  version       String       @default("1.0")
+  status        PolicyStatus @default(DRAFT)
+  effectiveDate DateTime
+  departmentId  String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
 
   acknowledgements PolicyAcknowledgement[]
 }
 
 model Badge {
-  id          String      @id @default(cuid())
+  id          String       @id @default(cuid())
   name        String
-  description String
-  icon        String?
-  unlockRule  Json
-  status      Status      @default(ACTIVE)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  description String?
+  iconUrl     String?
+  category    BadgeCategory @default(GENERAL)
+  unlockType  UnlockType   @default(MANUAL)
+  unlockValue Int          @default(0)
+  xpReward    Int          @default(0)
+  status      Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 
   userBadges UserBadge[]
 }
@@ -235,15 +298,16 @@ model UserBadge {
 }
 
 model Reward {
-  id             String           @id @default(cuid())
-  name           String
-  description    String
-  icon           String?
-  pointsRequired Int
-  stock          Int              @default(0)
-  status         Status           @default(ACTIVE)
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
+  id        String       @id @default(cuid())
+  name      String
+  description String?
+  imageUrl  String?
+  pointCost Int
+  stock     Int          @default(0)
+  category  BadgeCategory @default(GENERAL)
+  status    Boolean      @default(true)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
 
   redemptions RewardRedemption[]
 }
@@ -260,19 +324,19 @@ model RewardRedemption {
 }
 
 model CarbonTransaction {
-  id              String        @id @default(cuid())
-  date            DateTime      @default(now())
-  sourceType      SourceType
-  sourceId        String?
-  quantity        Float
+  id               String         @id @default(cuid())
+  date             DateTime       @default(now())
+  sourceType       String
+  sourceId         String?
+  quantity         Float
   emissionFactorId String?
-  emissionFactor  EmissionFactor? @relation(fields: [emissionFactorId], references: [id])
-  co2Amount       Float
-  departmentId    String
-  department      Department    @relation(fields: [departmentId], references: [id])
-  notes           String?
-  isManual        Boolean       @default(false)
-  createdAt       DateTime      @default(now())
+  emissionFactor   EmissionFactor? @relation(fields: [emissionFactorId], references: [id])
+  co2Amount        Float
+  departmentId     String
+  department       Department     @relation(fields: [departmentId], references: [id])
+  notes            String?
+  isManual         Boolean        @default(false)
+  createdAt        DateTime       @default(now())
 
   @@index([departmentId])
   @@index([date])
@@ -285,7 +349,7 @@ model CsrActivity {
   categoryId  String
   category    Category              @relation(fields: [categoryId], references: [id])
   date        DateTime
-  status      Status                @default(ACTIVE)
+  status      Boolean               @default(true)
   createdAt   DateTime              @default(now())
   updatedAt   DateTime              @updatedAt
 
@@ -293,18 +357,18 @@ model CsrActivity {
 }
 
 model EmployeeParticipation {
-  id              String         @id @default(cuid())
-  employeeId      String
-  csrActivityId   String
-  proofUrl        String?
-  approvalStatus  ApprovalStatus @default(PENDING)
-  pointsEarned    Int            @default(0)
-  completionDate  DateTime?
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
+  id             String         @id @default(cuid())
+  employeeId     String
+  csrActivityId  String
+  proofUrl       String?
+  approvalStatus ApprovalStatus @default(PENDING)
+  pointsEarned   Int            @default(0)
+  completionDate DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
 
-  employee   User        @relation(fields: [employeeId], references: [id])
-  csrActivity CsrActivity @relation(fields: [csrActivityId], references: [id])
+  employee    User         @relation(fields: [employeeId], references: [id])
+  csrActivity CsrActivity  @relation(fields: [csrActivityId], references: [id])
 
   @@unique([employeeId, csrActivityId])
 }

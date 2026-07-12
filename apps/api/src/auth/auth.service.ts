@@ -67,7 +67,7 @@ export class AuthService {
         organizationId: true,
         department: { select: { name: true, code: true } },
         ownedBadges: {
-          include: { badge: { select: { name: true, description: true, icon: true } } },
+          include: { badge: { select: { name: true, description: true, iconUrl: true } } },
           take: 10,
           orderBy: { awardedAt: 'desc' },
         },
@@ -90,7 +90,7 @@ export class AuthService {
       badges: user.ownedBadges.map(ub => ({
         name: ub.badge.name,
         description: ub.badge.description,
-        icon: ub.badge.icon,
+        iconUrl: ub.badge.iconUrl,
       })),
     };
   }
