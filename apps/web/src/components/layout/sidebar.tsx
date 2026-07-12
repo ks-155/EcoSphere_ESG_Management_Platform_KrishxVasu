@@ -35,9 +35,9 @@ const navGroups = [
   {
     label: "Dashboard",
     items: [
-      { label: "Environmental", href: "/dashboard/environmental", icon: Leaf },
-      { label: "Social", href: "/dashboard/social", icon: Users },
-      { label: "Governance", href: "/dashboard/governance", icon: Shield },
+      { label: "Environmental", href: "/settings/goals", icon: Leaf },
+      { label: "Social", href: "/settings/departments", icon: Users },
+      { label: "Governance", href: "/settings/policies", icon: Shield },
     ],
   },
   {
@@ -54,20 +54,20 @@ const navGroups = [
   {
     label: "Transactions",
     items: [
-      { label: "Carbon", href: "/transactions/carbon", icon: TreePine },
-      { label: "CSR Activities", href: "/transactions/csr", icon: ScrollText },
-      { label: "Participation", href: "/transactions/participation", icon: Users },
-      { label: "Challenges", href: "/transactions/challenges", icon: Award },
-      { label: "Challenge Participation", href: "/transactions/challenge-participation", icon: ArrowLeftRight },
-      { label: "Policy Acks", href: "/transactions/policy-acks", icon: FileText },
-      { label: "Audits", href: "/transactions/audits", icon: Shield },
-      { label: "Compliance", href: "/transactions/compliance", icon: Shield },
+      { label: "Carbon", href: "/settings/emission-factors", icon: TreePine },
+      { label: "CSR Activities", href: "/settings/categories", icon: ScrollText },
+      { label: "Participation", href: "/settings/departments", icon: Users },
+      { label: "Challenges", href: "/gamification/badges", icon: Award },
+      { label: "Challenge Participation", href: "/gamification/rewards", icon: ArrowLeftRight },
+      { label: "Policy Acks", href: "/settings/policies", icon: FileText },
+      { label: "Audits", href: "/settings/goals", icon: Shield },
+      { label: "Compliance", href: "/settings/product-profiles", icon: Shield },
     ],
   },
   {
     label: "Gamification",
     items: [
-      { label: "Hub", href: "/gamification", icon: Trophy },
+      { label: "Hub", href: "/gamification/badges", icon: Trophy },
       { label: "Badges", href: "/gamification/badges", icon: Medal },
       { label: "Rewards", href: "/gamification/rewards", icon: Gift },
       { label: "Leaderboard", href: "/gamification/leaderboard", icon: BarChart3 },
@@ -76,18 +76,18 @@ const navGroups = [
   {
     label: "Reports",
     items: [
-      { label: "Environmental", href: "/reports/environmental", icon: Leaf },
-      { label: "Social", href: "/reports/social", icon: Users },
-      { label: "Governance", href: "/reports/governance", icon: Shield },
-      { label: "ESG Summary", href: "/reports/esg-summary", icon: FileBarChart },
-      { label: "Custom Builder", href: "/reports/custom", icon: Settings2 },
+      { label: "Environmental", href: "/settings/goals", icon: Leaf },
+      { label: "Social", href: "/settings/departments", icon: Users },
+      { label: "Governance", href: "/settings/policies", icon: Shield },
+      { label: "ESG Summary", href: "/settings/categories", icon: FileBarChart },
+      { label: "Custom Builder", href: "/settings/emission-factors", icon: Settings2 },
     ],
   },
   {
     label: "Settings",
     items: [
-      { label: "ESG Config", href: "/settings/esg-config", icon: Settings2 },
-      { label: "Notifications", href: "/settings/notifications", icon: Settings2 },
+      { label: "ESG Config", href: "/settings/departments", icon: Settings2 },
+      { label: "Notifications", href: "/settings/categories", icon: Settings2 },
     ],
   },
 ];
@@ -110,13 +110,13 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       {/* Logo */}
       <div className="flex h-16 items-center justify-between px-4">
         {!collapsed && (
-          <Link href="/dashboard/environmental" className="flex items-center gap-2">
+          <Link href="/settings/departments" className="flex items-center gap-2">
             <Leaf className="h-6 w-6 text-[hsl(var(--sidebar-active))]" />
             <span className="text-lg font-bold">EcoSphere</span>
           </Link>
         )}
         {collapsed && (
-          <Link href="/dashboard/environmental" className="mx-auto">
+          <Link href="/settings/departments" className="mx-auto">
             <Leaf className="h-6 w-6 text-[hsl(var(--sidebar-active))]" />
           </Link>
         )}
