@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateChallengeParticipationDto } from './dto/create-challenge-participation.dto';
 import { UpdateChallengeParticipationDto } from './dto/update-challenge-participation.dto';
@@ -8,7 +9,7 @@ import { ApprovalStatus } from '@prisma/client';
 
 @Injectable()
 export class ChallengeParticipationsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private events: EventEmitter2) {}
 
   async findAll(query: any): Promise<PaginatedResponse<any>> {
     const { search, page, limit, sortBy, sortOrder } = parseQuery(query);
@@ -72,20 +73,60 @@ export class ChallengeParticipationsService {
       data: { xp: { increment: updated.xpAwarded } },
     });
 
-    const badges = await this.prisma.badge.findMany();
+    await this.prisma.notification.create({
+      data: {
+        userId: updated.employeeId,
+        type: 'CHALLENGE_APPROVAL',
+        title: 'Challenge Completed',
+        message: `You completed "${updated.challenge.title}" and earned ${updated.xpAwarded} XP!`,
+      },
+    });
+
+    const badges = await this.prisma.badge.findMany({ where: { status: true } });
+    const newlyAwarded: string[] = [];
+
     for (const badge of badges) {
-      const userParticipationCount = await this.prisma.challengeParticipation.count({
-        where: { employeeId: updated.employeeId, approvalStatus: ApprovalStatus.APPROVED },
-      });
       const hasBadge = await this.prisma.userBadge.findFirst({
         where: { userId: updated.employeeId, badgeId: badge.id },
       });
-      if (!hasBadge && badge.unlockType === 'CHALLENGE_COUNT' && badge.unlockValue > 0 && userParticipationCount >= badge.unlockValue) {
-        await this.prisma.userBadge.create({
-          data: { userId: updated.employeeId, badgeId: badge.id },
+      if (hasBadge) continue;
+
+      const user = await this.prisma.user.findUnique({ where: { id: updated.employeeId } });
+      let qualifies = false;
+
+      if (badge.unlockType === 'CHALLENGE_COUNT') {
+        const count = await this.prisma.challengeParticipation.count({
+          where: { employeeId: updated.employeeId, approvalStatus: ApprovalStatus.APPROVED },
+        });
+        qualifies = count >= badge.unlockValue;
+      } else if (badge.unlockType === 'XP_THRESHOLD') {
+        qualifies = (user?.xp ?? 0) >= badge.unlockValue;
+      }
+
+      if (qualifies) {
+        await this.prisma.$transaction([
+          this.prisma.userBadge.create({ data: { userId: updated.employeeId, badgeId: badge.id } }),
+          this.prisma.user.update({ where: { id: updated.employeeId }, data: { xp: { increment: badge.xpReward } } }),
+        ]);
+        newlyAwarded.push(badge.id);
+
+        await this.prisma.notification.create({
+          data: {
+            userId: updated.employeeId,
+            type: 'BADGE_UNLOCK',
+            title: 'Badge Earned!',
+            message: `You earned the "${badge.name}" badge! +${badge.xpReward} XP.`,
+          },
         });
       }
     }
+
+    this.events.emit('challenge.completed', {
+      userId: updated.employeeId,
+      challengeId: updated.challengeId,
+      xpAwarded: updated.xpAwarded,
+      newlyAwarded,
+    });
 
     return updated;
   }

@@ -26,6 +26,7 @@ import { EmployeeParticipationsModule } from './modules/employee-participations/
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { OrganizationModule } from './modules/organization/organization.module';
+import { ReportsModule } from './modules/reports/reports.module';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { OrganizationModule } from './modules/organization/organization.module';
     RewardRedemptionsModule,
     DepartmentScoresModule,
     DashboardModule,
+    ReportsModule,
   ],
 })
 export class AppModule {}

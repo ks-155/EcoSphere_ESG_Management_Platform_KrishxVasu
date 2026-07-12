@@ -110,4 +110,12 @@ export const dashboardApi = {
 
   updateOrgSettings: (data: any) =>
     apiClient.put<any>("/api/organization/settings", data).then((r) => r.data),
+
+  generateReport: (filters: {
+    departmentId?: string;
+    startDate?: string;
+    endDate?: string;
+    module?: string;
+    employeeId?: string;
+  }) => apiClient.post<any>("/api/reports/generate", filters).then((r) => r.data),
 };

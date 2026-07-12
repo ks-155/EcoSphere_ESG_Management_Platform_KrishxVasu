@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateEmployeeParticipationDto } from './dto/create-employee-participation.dto';
 import { UpdateEmployeeParticipationDto } from './dto/update-employee-participation.dto';
@@ -8,7 +9,7 @@ import { ApprovalStatus } from '@prisma/client';
 
 @Injectable()
 export class EmployeeParticipationsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private events: EventEmitter2) {}
 
   async findAll(query: any): Promise<PaginatedResponse<any>> {
     const { search, page, limit, sortBy, sortOrder } = parseQuery(query);
@@ -83,6 +84,46 @@ export class EmployeeParticipationsService {
         title: 'CSR Activity Approved',
         message: `Your participation in "${updated.csrActivity.title}" has been approved. ${updated.pointsEarned} points awarded.`,
       },
+    });
+
+    const user = await this.prisma.user.findUnique({ where: { id: updated.employeeId } });
+    const badges = await this.prisma.badge.findMany({ where: { status: true } });
+    const newlyAwarded: string[] = [];
+
+    for (const badge of badges) {
+      const hasBadge = await this.prisma.userBadge.findFirst({
+        where: { userId: updated.employeeId, badgeId: badge.id },
+      });
+      if (hasBadge) continue;
+
+      let qualifies = false;
+      if (badge.unlockType === 'XP_THRESHOLD') {
+        qualifies = (user?.xp ?? 0) >= badge.unlockValue;
+      }
+
+      if (qualifies) {
+        await this.prisma.$transaction([
+          this.prisma.userBadge.create({ data: { userId: updated.employeeId, badgeId: badge.id } }),
+          this.prisma.user.update({ where: { id: updated.employeeId }, data: { xp: { increment: badge.xpReward } } }),
+        ]);
+        newlyAwarded.push(badge.id);
+
+        await this.prisma.notification.create({
+          data: {
+            userId: updated.employeeId,
+            type: 'BADGE_UNLOCK',
+            title: 'Badge Earned!',
+            message: `You earned the "${badge.name}" badge! +${badge.xpReward} XP.`,
+          },
+        });
+      }
+    }
+
+    this.events.emit('csr.approved', {
+      userId: updated.employeeId,
+      csrActivityId: updated.csrActivityId,
+      pointsEarned: updated.pointsEarned,
+      newlyAwarded,
     });
 
     return updated;

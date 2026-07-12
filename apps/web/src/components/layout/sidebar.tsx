@@ -103,6 +103,12 @@ const navGroups = [
     ],
   },
   {
+    label: "Reports",
+    items: [
+      { label: "Custom Builder", href: "/reports/custom", icon: FileBarChart },
+    ],
+  },
+  {
     label: "Settings",
     items: [
       { label: "ESG Config", href: "/settings/esg-config", icon: Settings2 },
