@@ -8,6 +8,13 @@ import {
   policiesApi,
   badgesApi,
   rewardsApi,
+  carbonTransactionsApi,
+  csrActivitiesApi,
+  employeeParticipationApi,
+  challengesApi,
+  challengeParticipationApi,
+  auditsApi,
+  complianceIssuesApi,
 } from "@/lib/api/master-data";
 
 export const {
@@ -65,3 +72,55 @@ export const {
   useUpdate: useUpdateReward,
   useDelete: useDeleteReward,
 } = createCrudHooks("rewards", rewardsApi);
+
+// ─── Phase 3: Carbon Management ─────────────────────────────
+export const {
+  useList: useCarbonTransactions,
+  useCreate: useCreateCarbonTransaction,
+  useUpdate: useUpdateCarbonTransaction,
+  useDelete: useDeleteCarbonTransaction,
+} = createCrudHooks("carbon-transactions", carbonTransactionsApi);
+
+// ─── Phase 4: CSR & Challenges ──────────────────────────────
+export const {
+  useList: useCsrActivities,
+  useCreate: useCreateCsrActivity,
+  useUpdate: useUpdateCsrActivity,
+  useDelete: useDeleteCsrActivity,
+} = createCrudHooks("csr-activities", csrActivitiesApi);
+
+export const {
+  useList: useEmployeeParticipation,
+  useCreate: useCreateEmployeeParticipation,
+  useUpdate: useUpdateEmployeeParticipation,
+  useDelete: useDeleteEmployeeParticipation,
+} = createCrudHooks("employee-participation", employeeParticipationApi);
+
+export const {
+  useList: useChallenges,
+  useCreate: useCreateChallenge,
+  useUpdate: useUpdateChallenge,
+  useDelete: useDeleteChallenge,
+} = createCrudHooks("challenges", challengesApi);
+
+export const {
+  useList: useChallengeParticipation,
+  useCreate: useCreateChallengeParticipation,
+  useUpdate: useUpdateChallengeParticipation,
+  useDelete: useDeleteChallengeParticipation,
+} = createCrudHooks("challenge-participation", challengeParticipationApi);
+
+// ─── Phase 5: Audits & Compliance ───────────────────────────
+export const {
+  useList: useAudits,
+  useCreate: useCreateAudit,
+  useUpdate: useUpdateAudit,
+  useDelete: useDeleteAudit,
+} = createCrudHooks("audits", auditsApi);
+
+export const {
+  useList: useComplianceIssues,
+  useCreate: useCreateComplianceIssue,
+  useUpdate: useUpdateComplianceIssue,
+  useDelete: useDeleteComplianceIssue,
+} = createCrudHooks("compliance-issues", complianceIssuesApi);
