@@ -3,8 +3,6 @@
 import { useState } from "react";
 import { Sidebar } from "./sidebar";
 import { Topbar } from "./topbar";
-import { Breadcrumb } from "./breadcrumb";
-import { Footer } from "./footer";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 
@@ -17,7 +15,7 @@ export function MainLayout({ children }: MainLayoutProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen">
       {/* Desktop sidebar */}
       <div className="hidden md:block">
         <Sidebar collapsed={collapsed} onToggle={() => setCollapsed(!collapsed)} />
@@ -33,16 +31,12 @@ export function MainLayout({ children }: MainLayoutProps) {
       {/* Main content area */}
       <div
         className={cn(
-          "flex-1 transition-all duration-300",
+          "transition-all duration-300",
           collapsed ? "md:ml-16" : "md:ml-64"
         )}
       >
         <Topbar onMenuClick={() => setMobileOpen(true)} />
-        <main className="p-4 sm:p-6 lg:p-8">
-          <Breadcrumb />
-          {children}
-        </main>
-        <Footer />
+        <main className="p-4 sm:p-6 lg:p-8">{children}</main>
       </div>
     </div>
   );
