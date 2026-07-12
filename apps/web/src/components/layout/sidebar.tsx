@@ -33,6 +33,11 @@ import {
   AlertTriangle,
   FileSearch,
   Cloud,
+  Bell,
+  Handshake,
+  Calculator,
+  TicketCheck,
+  GitPullRequest,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -40,9 +45,7 @@ const navGroups = [
   {
     label: "Dashboard",
     items: [
-      { label: "Environmental", href: "/settings/goals", icon: Leaf },
-      { label: "Social", href: "/settings/departments", icon: Users },
-      { label: "Governance", href: "/settings/policies", icon: Shield },
+      { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
     ],
   },
   {
@@ -67,8 +70,10 @@ const navGroups = [
     label: "CSR & Challenges",
     items: [
       { label: "CSR Initiatives", href: "/csr/initiatives", icon: Activity },
+      { label: "CSR Participation", href: "/csr/participation", icon: Handshake },
       { label: "Challenge Templates", href: "/challenges/templates", icon: Swords },
       { label: "Submissions", href: "/challenges/submissions", icon: ScrollText },
+      { label: "Leaderboard", href: "/gamification/leaderboard", icon: Trophy },
     ],
   },
   {
@@ -80,29 +85,25 @@ const navGroups = [
     ],
   },
   {
-    label: "Gamification",
+    label: "ESG Scores",
     items: [
-      { label: "Hub", href: "/gamification/badges", icon: Trophy },
-      { label: "Badges", href: "/gamification/badges", icon: Medal },
-      { label: "Rewards", href: "/gamification/rewards", icon: Gift },
-      { label: "Leaderboard", href: "/gamification/leaderboard", icon: BarChart3 },
+      { label: "Department Scores", href: "/esg/department-scores", icon: Calculator },
     ],
   },
   {
-    label: "Reports",
+    label: "Gamification",
     items: [
-      { label: "Environmental", href: "/settings/goals", icon: Leaf },
-      { label: "Social", href: "/settings/departments", icon: Users },
-      { label: "Governance", href: "/settings/policies", icon: Shield },
-      { label: "ESG Summary", href: "/settings/categories", icon: FileBarChart },
-      { label: "Custom Builder", href: "/settings/emission-factors", icon: Settings2 },
+      { label: "Badges", href: "/gamification/badges", icon: Medal },
+      { label: "User Badges", href: "/gamification/user-badges", icon: Award },
+      { label: "Rewards", href: "/gamification/rewards", icon: Gift },
+      { label: "Redemptions", href: "/gamification/redemptions", icon: TicketCheck },
     ],
   },
   {
     label: "Settings",
     items: [
-      { label: "ESG Config", href: "/settings/departments", icon: Settings2 },
-      { label: "Notifications", href: "/settings/categories", icon: Settings2 },
+      { label: "Policy Acknowledgements", href: "/settings/policy-acknowledgements", icon: FileText },
+      { label: "Notifications", href: "/notifications", icon: Bell },
     ],
   },
 ];
@@ -125,13 +126,13 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       {/* Logo */}
       <div className="flex h-16 items-center justify-between px-4">
         {!collapsed && (
-          <Link href="/settings/departments" className="flex items-center gap-2">
+          <Link href="/dashboard" className="flex items-center gap-2">
             <Leaf className="h-6 w-6 text-[hsl(var(--sidebar-active))]" />
             <span className="text-lg font-bold">EcoSphere</span>
           </Link>
         )}
         {collapsed && (
-          <Link href="/settings/departments" className="mx-auto">
+          <Link href="/dashboard" className="mx-auto">
             <Leaf className="h-6 w-6 text-[hsl(var(--sidebar-active))]" />
           </Link>
         )}

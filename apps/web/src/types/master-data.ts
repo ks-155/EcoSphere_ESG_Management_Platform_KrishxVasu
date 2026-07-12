@@ -224,3 +224,110 @@ export interface ComplianceIssue {
   createdAt: string;
   updatedAt: string;
 }
+
+// ─── Person B's New Modules ─────────────────────────────────
+
+export interface DepartmentScore {
+  id: string;
+  departmentId: string;
+  environmentalScore: number;
+  socialScore: number;
+  governanceScore: number;
+  totalScore: number;
+  periodStart: string;
+  periodEnd: string;
+  department?: Department;
+  createdAt: string;
+}
+
+export type NotificationType = "COMPLIANCE_ISSUE" | "CSR_APPROVAL" | "CHALLENGE_APPROVAL" | "POLICY_REMINDER" | "BADGE_UNLOCK" | "REWARD_REDEEMED";
+
+export interface Notification {
+  id: string;
+  userId: string;
+  type: NotificationType;
+  title: string;
+  message: string;
+  link?: string;
+  isRead: boolean;
+  createdAt: string;
+}
+
+export interface PolicyAcknowledgement {
+  id: string;
+  policyId: string;
+  employeeId: string;
+  accepted: boolean;
+  acceptedAt: string;
+  policy?: Policy;
+  employee?: { id: string; name: string; email: string };
+}
+
+export interface RewardRedemption {
+  id: string;
+  userId: string;
+  rewardId: string;
+  pointsSpent: number;
+  redeemedAt: string;
+  user?: { id: string; name: string; email: string };
+  reward?: Reward;
+}
+
+export interface UserBadge {
+  id: string;
+  userId: string;
+  badgeId: string;
+  awardedAt: string;
+  user?: { id: string; name: string; email: string };
+  badge?: Badge;
+}
+
+// ─── Dashboard types ────────────────────────────────────────
+
+export interface DashboardOverview {
+  totalDepartments: number;
+  totalUsers: number;
+  totalCarbon: number;
+  totalCSRActivities: number;
+  totalChallenges: number;
+  totalBadgesAwarded: number;
+  overallESGScore: number;
+}
+
+export interface EnvironmentalDashboard {
+  carbonByDepartment: Array<{ departmentId: string; departmentName: string; totalCO2: number; transactionCount: number }>;
+  carbonTrend: Array<{ month: string; totalCO2: number }>;
+  goalsProgress: Array<{ id: string; name: string; targetValue: number; currentValue: number; status: string; deadline: string; progressPercent: number }>;
+}
+
+export interface SocialDashboard {
+  csrParticipationStats: { total: number; approved: number; pending: number; rejected: number };
+  challengeCompletionStats: { total: number; completed: number };
+  topEmployees: Array<{ id: string; name: string; email: string; xp: number }>;
+  participationTrend: Array<{ month: string; count: number }>;
+}
+
+export interface GovernanceDashboard {
+  policyAcknowledgementRate: number;
+  auditStatusBreakdown: Array<{ status: string; _count: number }>;
+  complianceIssuesBySeverity: Array<{ severity: string; _count: number }>;
+  issuesByStatus: Array<{ status: string; _count: number }>;
+}
+
+export interface LeaderboardEntry {
+  rank: number;
+  id: string;
+  name: string;
+  email: string;
+  xp: number;
+  departmentId: string;
+  avatar?: string;
+  badgeCount: number;
+}
+
+export interface ChallengeLeaderboardEntry {
+  rank: number;
+  employeeId: string;
+  employee: { id: string; name: string; email: string };
+  totalXp: number;
+}

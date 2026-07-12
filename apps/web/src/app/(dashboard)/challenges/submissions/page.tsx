@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { DataTable, PageHeader } from "@/components/shared";
 import { Badge } from "@/components/ui/badge";
-import { useChallengeParticipation } from "@/lib/hooks/use-master-data";
+import { useChallengeParticipations } from "@/lib/hooks/use-master-data";
 import type { ChallengeParticipation } from "@/types/master-data";
 
 const approvalVariant: Record<string, "default" | "secondary" | "success" | "warning" | "destructive"> = {
@@ -14,7 +14,7 @@ const approvalVariant: Record<string, "default" | "secondary" | "success" | "war
 };
 
 export default function ChallengeSubmissionsPage() {
-  const { data, isLoading } = useChallengeParticipation();
+  const { data, isLoading } = useChallengeParticipations();
 
   const columns: ColumnDef<ChallengeParticipation>[] = useMemo(() => [
     { accessorKey: "challengeId", header: "Challenge" },
