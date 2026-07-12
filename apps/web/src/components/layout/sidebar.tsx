@@ -13,7 +13,6 @@ import {
   Settings2,
   FileBarChart,
   Trophy,
-  ArrowLeftRight,
   Building2,
   Tags,
   FlaskConical,
@@ -28,6 +27,12 @@ import {
   Award,
   ChevronLeft,
   ChevronRight,
+  Activity,
+  Swords,
+  ClipboardCheck,
+  AlertTriangle,
+  FileSearch,
+  Cloud,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -52,16 +57,26 @@ const navGroups = [
     ],
   },
   {
-    label: "Transactions",
+    label: "Carbon Management",
     items: [
-      { label: "Carbon", href: "/settings/emission-factors", icon: TreePine },
-      { label: "CSR Activities", href: "/settings/categories", icon: ScrollText },
-      { label: "Participation", href: "/settings/departments", icon: Users },
-      { label: "Challenges", href: "/gamification/badges", icon: Award },
-      { label: "Challenge Participation", href: "/gamification/rewards", icon: ArrowLeftRight },
-      { label: "Policy Acks", href: "/settings/policies", icon: FileText },
-      { label: "Audits", href: "/settings/goals", icon: Shield },
-      { label: "Compliance", href: "/settings/product-profiles", icon: Shield },
+      { label: "Carbon Entries", href: "/carbon/entries", icon: Cloud },
+      { label: "Net Zero Target", href: "/carbon/net-zero", icon: TreePine },
+    ],
+  },
+  {
+    label: "CSR & Challenges",
+    items: [
+      { label: "CSR Initiatives", href: "/csr/initiatives", icon: Activity },
+      { label: "Challenge Templates", href: "/challenges/templates", icon: Swords },
+      { label: "Submissions", href: "/challenges/submissions", icon: ScrollText },
+    ],
+  },
+  {
+    label: "Audits & Compliance",
+    items: [
+      { label: "Audit Schedules", href: "/audits/schedules", icon: ClipboardCheck },
+      { label: "Compliance Issues", href: "/audits/compliance", icon: AlertTriangle },
+      { label: "Audit Reports", href: "/audits/reports", icon: FileSearch },
     ],
   },
   {

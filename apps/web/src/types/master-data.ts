@@ -121,3 +121,106 @@ export interface Reward {
   createdAt: string;
   updatedAt: string;
 }
+
+// ─── Phase 3: Carbon Management ──────────────────────────────
+
+export interface CarbonTransaction {
+  id: string;
+  date: string;
+  sourceType: string;
+  sourceId?: string;
+  quantity: number;
+  emissionFactorId?: string;
+  co2Amount: number;
+  departmentId: string;
+  notes?: string;
+  isManual: boolean;
+  createdAt: string;
+}
+
+// ─── Phase 4: CSR & Challenges ───────────────────────────────
+
+export interface CsrActivity {
+  id: string;
+  title: string;
+  description?: string;
+  categoryId: string;
+  date: string;
+  status: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type ApprovalStatus = "PENDING" | "APPROVED" | "REJECTED";
+
+export interface EmployeeParticipation {
+  id: string;
+  employeeId: string;
+  csrActivityId: string;
+  proofUrl?: string;
+  approvalStatus: ApprovalStatus;
+  pointsEarned: number;
+  completionDate?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type Difficulty = "EASY" | "MEDIUM" | "HARD";
+
+export interface Challenge {
+  id: string;
+  title: string;
+  description?: string;
+  categoryId: string;
+  xp: number;
+  difficulty: Difficulty;
+  evidenceRequired: boolean;
+  deadline?: string;
+  status: ChallengeStatus;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type ChallengeStatus = "DRAFT" | "ACTIVE" | "UNDER_REVIEW" | "COMPLETED" | "ARCHIVED";
+
+export interface ChallengeParticipation {
+  id: string;
+  challengeId: string;
+  employeeId: string;
+  progress: number;
+  evidenceUrl?: string;
+  approvalStatus: ApprovalStatus;
+  xpAwarded: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ─── Phase 5: Audits & Compliance ────────────────────────────
+
+export type AuditStatus = "PLANNED" | "IN_PROGRESS" | "COMPLETED";
+
+export interface Audit {
+  id: string;
+  title: string;
+  description?: string;
+  date: string;
+  status: AuditStatus;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type Severity = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+export type IssueStatus = "OPEN" | "IN_PROGRESS" | "RESOLVED" | "CLOSED";
+
+export interface ComplianceIssue {
+  id: string;
+  auditId?: string;
+  severity: Severity;
+  description: string;
+  ownerId: string;
+  dueDate: string;
+  status: IssueStatus;
+  isOverdue: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
