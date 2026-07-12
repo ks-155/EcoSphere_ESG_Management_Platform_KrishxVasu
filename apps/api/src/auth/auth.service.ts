@@ -83,10 +83,11 @@ export class AuthService {
       email: user.email,
       name: user.name,
       role: user.role,
-      departmentId: user.departmentId,
-      departmentName: user.department?.name || null,
-      avatarUrl: user.avatar,
       xp: user.xp,
+      avatar: user.avatar || null,
+      department: user.department?.name || null,
+      departmentId: user.departmentId || null,
+      organizationId: user.organizationId || null,
       badges: user.ownedBadges.map(ub => ({
         name: ub.badge.name,
         description: ub.badge.description,
@@ -121,18 +122,18 @@ export class AuthService {
     const payload = { sub: user.id, email: user.email, role: user.role };
 
     return {
+      accessToken: this.jwt.sign(payload, { expiresIn: '15m' }),
+      refreshToken: this.jwt.sign(payload, { expiresIn: '7d' }),
       user: {
         id: user.id,
         email: user.email,
         name: user.name,
         role: user.role,
-        departmentId: user.departmentId || undefined,
-        departmentName: user.department?.name || undefined,
-        avatarUrl: user.avatar || undefined,
-      },
-      tokens: {
-        accessToken: this.jwt.sign(payload, { expiresIn: '15m' }),
-        refreshToken: this.jwt.sign(payload, { expiresIn: '7d' }),
+        xp: user.xp || 0,
+        avatar: user.avatar || null,
+        department: user.department?.name || null,
+        departmentId: user.departmentId || null,
+        organizationId: user.organizationId || null,
       },
     };
   }
