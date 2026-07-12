@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Critical: GPU-accelerated scroll & layout ─────────────── */
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -28,6 +36,9 @@
     --sidebar-foreground: 210 40% 98%;
     --sidebar-muted: 217 33% 25%;
     --sidebar-active: 142 76% 36%;
+    /* Sidebar widths as CSS vars for GPU-safe transitions */
+    --sidebar-w-expanded: 15rem;   /* 240px */
+    --sidebar-w-collapsed: 4rem;   /* 64px */
   }
 
   .dark {
@@ -58,11 +69,173 @@
 }
 
 @layer base {
-  * {
-    @apply border-border;
+  /* Scoped border instead of universal selector (avoids painting every element) */
+  input,
+  button,
+  select,
+  textarea,
+  [class*="border"] {
+    border-color: hsl(var(--border));
   }
 
   body {
     @apply bg-background text-foreground;
+    /* Prevent layout shifts during font load */
+    font-display: swap;
+    /* Smooth composited scrolling on mobile */
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: none;
   }
+
+  /* Reduce paint on scroll containers */
+  main {
+    contain: layout style;
+  }
+}
+
+/* ─── GPU-accelerated sidebar transition ────────────────────── */
+/* Use transform instead of margin/width to avoid layout thrashing */
+.sidebar-panel {
+  will-change: transform;
+  transition: transform 280ms cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateX(0);
+}
+
+.sidebar-panel.collapsed {
+  transform: translateX(calc(var(--sidebar-w-collapsed) - var(--sidebar-w-expanded)));
+}
+
+/* Content area shift — use margin-left only (no transition-all) */
+.content-area {
+  transition: margin-left 280ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ─── Scrollbar optimization ────────────────────────────────── */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--border)) transparent;
+}
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--border));
+  border-radius: 9999px;
+}
+
+/* ─── GPU-friendly card hover (transform only, no box-shadow change) */
+.card-hover {
+  transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.card-hover:hover {
+  transform: translateY(-2px) translateZ(0);
+}
+
+/* ─── Fade-in animation (opacity + transform only = GPU) ────── */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.35s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+/* Staggered children */
+.animate-fade-up:nth-child(1) { animation-delay: 0ms; }
+.animate-fade-up:nth-child(2) { animation-delay: 60ms; }
+.animate-fade-up:nth-child(3) { animation-delay: 120ms; }
+.animate-fade-up:nth-child(4) { animation-delay: 180ms; }
+
+/* ─── Skeleton shimmer (GPU composited) ─────────────────────── */
+@keyframes shimmer {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(100%); }
+}
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: hsl(var(--muted));
+  border-radius: var(--radius);
+}
+
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    hsl(var(--background) / 0.6) 50%,
+    transparent 100%
+  );
+  animation: shimmer 1.4s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* ─── Reduced motion: respect user preference ───────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .animate-fade-up {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .skeleton::after {
+    animation: none;
+  }
+}
+
+/* ─── Table performance: avoid repaints on hover ────────────── */
+tbody tr {
+  transition: background-color 100ms ease;
+  /* Isolate each row's paint */
+  contain: layout;
+}
+
+/* ─── Progress bar (GPU composited) ─────────────────────────── */
+.progress-bar {
+  transform-origin: left;
+  transition: transform 600ms cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+/* ─── Active nav tab indicator (transform, no layout) ───────── */
+.nav-tab-indicator {
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 200ms ease;
+}
+
+/* ─── Content visibility: skip off-screen rendering ─────────── */
+.content-section {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 400px;
 }

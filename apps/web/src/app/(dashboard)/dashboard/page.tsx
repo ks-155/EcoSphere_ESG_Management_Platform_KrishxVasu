@@ -1,5 +1,7 @@
 "use client";
 
+import { useMemo, memo } from "react";
+import dynamic from "next/dynamic";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -18,45 +20,58 @@ import { cn } from "@/lib/utils";
 import {
   useDashboardOverview,
   useDashboardEnvironmental,
-  useDashboardSocial,
-  useDashboardGovernance,
-  useDashboardLeaderboard,
 } from "@/lib/hooks/use-master-data";
-import {
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+
+const EmissionsTrendChart = dynamic(
+  () => import("./_charts/emissions-trend").then((m) => m.EmissionsTrendChart),
+  { ssr: false, loading: () => <div className="h-[200px] skeleton" /> }
+);
+
+const DeptRankingChart = dynamic(
+  () => import("./_charts/dept-ranking").then((m) => m.DeptRankingChart),
+  { ssr: false, loading: () => <div className="h-[200px] skeleton" /> }
+);
+
+const tooltipStyle = {
+  background: "hsl(var(--popover))",
+  border: "1px solid hsl(var(--border))",
+  borderRadius: "6px",
+  fontSize: "12px",
+} as const;
+
+function KpiTile({ kpi }: { kpi: { label: string; value: string; trend: string; up: boolean; color: string; borderColor: string } }) {
+  return (
+    <Card className={cn("border-l-4 card-hover cursor-pointer", kpi.borderColor)}>
+      <CardHeader className="pb-1 pt-3 px-4">
+        <CardTitle className="text-xs font-medium text-muted-foreground">
+          {kpi.label}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="pb-3 px-4">
+        <div className={cn("text-2xl font-bold", kpi.color)}>{kpi.value}</div>
+        <div className="flex items-center gap-1 mt-1">
+          {kpi.up ? (
+            <TrendingUp className="h-3 w-3 text-emerald-500" />
+          ) : (
+            <TrendingDown className="h-3 w-3 text-red-500" />
+          )}
+          <span className={cn("text-xs", kpi.up ? "text-emerald-500" : "text-red-500")}>
+            {kpi.trend} vs last month
+          </span>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+const MemoKpiTile = memo(KpiTile);
 
 export default function DashboardPage() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const { data: overview } = useDashboardOverview();
   const { data: envData } = useDashboardEnvironmental();
-  const { data: socialData } = useDashboardSocial();
-  const { data: govData } = useDashboardGovernance();
-  const { data: leaderboard } = useDashboardLeaderboard(5);
 
-  if (!isAuthenticated) {
-    return (
-      <div className="flex flex-col items-center justify-center py-24">
-        <LogIn className="mb-4 h-12 w-12 text-muted-foreground" />
-        <h2 className="mb-2 text-xl font-semibold">Welcome to EcoSphere ESG</h2>
-        <p className="mb-6 text-muted-foreground">Please log in to view the dashboard.</p>
-        <Link href="/login">
-          <Button>Go to Login</Button>
-        </Link>
-      </div>
-    );
-  }
-
-  // Build KPI tiles from wireframe: Environmental Score, Social Score, Governance Score, Overall ESG
-  const kpiTiles = [
+  const kpiTiles = useMemo(() => [
     {
       label: "Environmental Score",
       value: overview?.overallESGScore != null ? `${Math.round(overview.overallESGScore * 0.82)} / 100` : "82 / 100",
@@ -89,47 +104,55 @@ export default function DashboardPage() {
       color: "text-orange-500",
       borderColor: "border-l-orange-500",
     },
-  ];
+  ], [overview?.overallESGScore]);
 
-  // Emissions trend mock data
-  const emissionsTrend = envData?.carbonTrend?.length
-    ? envData.carbonTrend.map((d) => ({ month: d.month, value: d.totalCO2 }))
-    : [
-        { month: "Jan", value: 420 },
-        { month: "Feb", value: 380 },
-        { month: "Mar", value: 450 },
-        { month: "Apr", value: 390 },
-        { month: "May", value: 340 },
-        { month: "Jun", value: 310 },
-        { month: "Jul", value: 360 },
-        { month: "Aug", value: 290 },
-        { month: "Sep", value: 320 },
-        { month: "Oct", value: 280 },
-        { month: "Nov", value: 260 },
-        { month: "Dec", value: 240 },
-      ];
+  const emissionsTrend = useMemo(() => {
+    if (envData?.carbonTrend?.length) {
+      return envData.carbonTrend.map((d) => ({ month: d.month, value: d.totalCO2 }));
+    }
+    return [
+      { month: "Jan", value: 420 }, { month: "Feb", value: 380 },
+      { month: "Mar", value: 450 }, { month: "Apr", value: 390 },
+      { month: "May", value: 340 }, { month: "Jun", value: 310 },
+      { month: "Jul", value: 360 }, { month: "Aug", value: 290 },
+      { month: "Sep", value: 320 }, { month: "Oct", value: 280 },
+      { month: "Nov", value: 260 }, { month: "Dec", value: 240 },
+    ];
+  }, [envData?.carbonTrend]);
 
-  // Dept ESG ranking data
-  const deptRanking = envData?.carbonByDepartment?.length
-    ? envData.carbonByDepartment.slice(0, 5).map((d) => ({
+  const deptRanking = useMemo(() => {
+    if (envData?.carbonByDepartment?.length) {
+      return envData.carbonByDepartment.slice(0, 5).map((d) => ({
         name: d.departmentName.slice(0, 4),
         value: Math.round(100 - d.totalCO2 / 10),
-      }))
-    : [
-        { name: "Biz", value: 88 },
-        { name: "Mfg", value: 72 },
-        { name: "Logi", value: 65 },
-        { name: "Corp", value: 91 },
-        { name: "R&D", value: 78 },
-      ];
+      }));
+    }
+    return [
+      { name: "Biz", value: 88 }, { name: "Mfg", value: 72 },
+      { name: "Logi", value: 65 }, { name: "Corp", value: 91 },
+      { name: "R&D", value: 78 },
+    ];
+  }, [envData?.carbonByDepartment]);
 
-  // Recent activity
-  const recentActivity = [
+  const recentActivity = useMemo(() => [
     { icon: "✓", text: "Priya completed 'Zero Waste Week'", type: "success" },
     { icon: "⚠", text: "New compliance issue in Logistics", type: "warning" },
     { icon: "📊", text: "47 new Carbon Transactions logged", type: "info" },
     { icon: "✓", text: "R&D acknowledged Anti-Corruption Policy", type: "success" },
-  ];
+  ], []);
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24">
+        <LogIn className="mb-4 h-12 w-12 text-muted-foreground" />
+        <h2 className="mb-2 text-xl font-semibold">Welcome to EcoSphere ESG</h2>
+        <p className="mb-6 text-muted-foreground">Please log in to view the dashboard.</p>
+        <Link href="/login">
+          <Button>Go to Login</Button>
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-5">
@@ -144,32 +167,7 @@ export default function DashboardPage() {
       {/* KPI Tiles */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {kpiTiles.map((kpi) => (
-          <Card
-            key={kpi.label}
-            className={cn(
-              "border-l-4 hover:shadow-md transition-shadow cursor-pointer",
-              kpi.borderColor
-            )}
-          >
-            <CardHeader className="pb-1 pt-3 px-4">
-              <CardTitle className="text-xs font-medium text-muted-foreground">
-                {kpi.label}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pb-3 px-4">
-              <div className={cn("text-2xl font-bold", kpi.color)}>{kpi.value}</div>
-              <div className="flex items-center gap-1 mt-1">
-                {kpi.up ? (
-                  <TrendingUp className="h-3 w-3 text-emerald-500" />
-                ) : (
-                  <TrendingDown className="h-3 w-3 text-red-500" />
-                )}
-                <span className={cn("text-xs", kpi.up ? "text-emerald-500" : "text-red-500")}>
-                  {kpi.trend} vs last month
-                </span>
-              </div>
-            </CardContent>
-          </Card>
+          <MemoKpiTile key={kpi.label} kpi={kpi} />
         ))}
       </div>
 
@@ -184,29 +182,7 @@ export default function DashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-3">
-            <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={emissionsTrend}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis dataKey="month" tick={{ fontSize: 10 }} />
-                <YAxis tick={{ fontSize: 10 }} />
-                <Tooltip
-                  contentStyle={{
-                    background: "hsl(var(--popover))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "6px",
-                    fontSize: "12px",
-                  }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="value"
-                  stroke="#22c55e"
-                  strokeWidth={2}
-                  dot={{ fill: "#22c55e", r: 3 }}
-                  activeDot={{ r: 5 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            <EmissionsTrendChart data={emissionsTrend} tooltipStyle={tooltipStyle} />
           </CardContent>
         </Card>
 
@@ -219,22 +195,7 @@ export default function DashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-3">
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={deptRanking}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis dataKey="name" tick={{ fontSize: 10 }} />
-                <YAxis tick={{ fontSize: 10 }} domain={[0, 100]} />
-                <Tooltip
-                  contentStyle={{
-                    background: "hsl(var(--popover))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "6px",
-                    fontSize: "12px",
-                  }}
-                />
-                <Bar dataKey="value" fill="#6366f1" radius={[3, 3, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            <DeptRankingChart data={deptRanking} tooltipStyle={tooltipStyle} />
           </CardContent>
         </Card>
       </div>

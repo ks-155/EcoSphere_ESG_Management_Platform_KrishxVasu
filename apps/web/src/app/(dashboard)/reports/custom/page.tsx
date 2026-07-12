@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -70,10 +70,16 @@ const filterOptions = [
 export default function ReportsPage() {
   const [activeTab, setActiveTab] = useState("environmental");
   const [generating, setGenerating] = useState<string | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+  }, []);
 
   const handleGenerate = (type: string) => {
+    if (timerRef.current) clearTimeout(timerRef.current);
     setGenerating(type);
-    setTimeout(() => setGenerating(null), 2000);
+    timerRef.current = setTimeout(() => setGenerating(null), 2000);
   };
 
   return (

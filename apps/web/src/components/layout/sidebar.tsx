@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { memo } from "react";
 import {
   Leaf,
   Users,
@@ -25,18 +26,14 @@ import {
   Activity,
   ClipboardCheck,
   AlertTriangle,
-  FileSearch,
   Cloud,
   Bell,
   Handshake,
   Calculator,
-  TicketCheck,
-  Award,
-  LayoutDashboard,
-  Package,
   Swords,
   FileText,
-  TreePine,
+  LayoutDashboard,
+  Package,
   CircleUser,
 } from "lucide-react";
 
@@ -116,7 +113,7 @@ interface SidebarProps {
   onToggle: () => void;
 }
 
-export function Sidebar({ collapsed, onToggle }: SidebarProps) {
+export const Sidebar = memo(function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const pathname = usePathname();
 
   return (
@@ -198,4 +195,4 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       </div>
     </aside>
   );
-}
+});

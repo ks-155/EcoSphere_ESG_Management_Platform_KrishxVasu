@@ -236,8 +236,8 @@ export default function SocialPage() {
             </CardHeader>
             <CardContent className="px-4 pb-4">
               <div className="space-y-3">
-                {["Logistics", "Manufacturing", "Corporate", "R&D"].map((dept) => {
-                  const pct = Math.floor(Math.random() * 30 + 30);
+                {[42, 38, 55, 35].map((pct, i) => {
+                  const dept = ["Logistics", "Manufacturing", "Corporate", "R&D"][i];
                   return (
                     <div key={dept}>
                       <div className="flex justify-between text-xs mb-1">

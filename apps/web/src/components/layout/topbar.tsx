@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, memo, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/auth-store";
@@ -32,7 +32,7 @@ const moduleNav = [
   { label: "Settings", href: "/settings/departments", match: ["/settings/departments", "/settings/categories", "/settings/esg-config", "/notifications", "/profile"] },
 ];
 
-export function Topbar({ onMenuClick }: TopbarProps) {
+export const Topbar = memo(function Topbar({ onMenuClick }: TopbarProps) {
   const { user, logout } = useAuthStore();
   const [showSearch, setShowSearch] = useState(false);
   const pathname = usePathname();
@@ -44,6 +44,11 @@ export function Topbar({ onMenuClick }: TopbarProps) {
   const activeModule = moduleNav.find((m) =>
     m.match.some((prefix) => pathname === prefix || pathname.startsWith(prefix + "/"))
   )?.href ?? "/dashboard";
+
+  const activeModuleLabel = moduleNav.find((m) => activeModule === m.href)?.label ?? "Dashboard";
+
+  const toggleSearch = useCallback(() => setShowSearch((s) => !s), []);
+  const handleLogout = useCallback(() => { logout(); }, [logout]);
 
   return (
     <header className="sticky top-0 z-30 flex flex-col border-b bg-background shadow-sm">
@@ -61,7 +66,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
 
         {/* App label - dynamic based on active module */}
         <span className="hidden md:inline-flex text-xs font-semibold text-muted-foreground bg-muted px-2 py-0.5 rounded">
-          EcoSphere: {moduleNav.find((m) => activeModule === m.href)?.label ?? "Dashboard"}
+          EcoSphere: {activeModuleLabel}
         </span>
 
         {/* Search */}
@@ -82,7 +87,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
             variant="ghost"
             size="icon"
             className="md:hidden h-7 w-7"
-            onClick={() => setShowSearch(!showSearch)}
+            onClick={toggleSearch}
           >
             <Search className="h-4 w-4" />
           </Button>
@@ -129,7 +134,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => logout()}>
+              <DropdownMenuItem onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
                 Log out
               </DropdownMenuItem>
@@ -160,4 +165,4 @@ export function Topbar({ onMenuClick }: TopbarProps) {
       </nav>
     </header>
   );
-}
+});
