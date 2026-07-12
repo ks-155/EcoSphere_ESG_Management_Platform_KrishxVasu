@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/auth-store";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -20,94 +22,142 @@ interface TopbarProps {
   onMenuClick: () => void;
 }
 
+const moduleNav = [
+  { label: "Dashboard", href: "/dashboard" },
+  { label: "Environmental", href: "/environmental" },
+  { label: "Social", href: "/social" },
+  { label: "Governance", href: "/governance" },
+  { label: "Gamification", href: "/gamification" },
+  { label: "Reports", href: "/reports/custom" },
+  { label: "Settings", href: "/settings/departments" },
+];
+
 export function Topbar({ onMenuClick }: TopbarProps) {
   const { user, logout } = useAuthStore();
   const [showSearch, setShowSearch] = useState(false);
+  const pathname = usePathname();
 
   const initials = user?.name
     ? user.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
     : "U";
 
+  const activeModule = moduleNav.find((m) =>
+    pathname === m.href || pathname.startsWith(m.href.split("?")[0])
+  )?.href ?? "/dashboard";
+
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background px-4 sm:px-6">
-      {/* Mobile menu trigger */}
-      <Button
-        variant="ghost"
-        size="icon"
-        className="md:hidden"
-        onClick={onMenuClick}
-      >
-        <Menu className="h-5 w-5" />
-      </Button>
-
-      {/* Search - hidden on small screens if not active */}
-      <div className={cn("flex-1", showSearch ? "block" : "hidden md:block")}>
-        <div className="relative max-w-md">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search..."
-            className="w-full pl-8"
-          />
-        </div>
-      </div>
-
-      <div className="flex items-center gap-2 ml-auto">
-        {/* Search toggle for mobile */}
+    <header className="sticky top-0 z-30 flex flex-col border-b bg-background shadow-sm">
+      {/* Top row */}
+      <div className="flex h-12 items-center gap-3 px-4">
+        {/* Mobile menu trigger */}
         <Button
           variant="ghost"
           size="icon"
-          className="md:hidden"
-          onClick={() => setShowSearch(!showSearch)}
+          className="md:hidden h-8 w-8"
+          onClick={onMenuClick}
         >
-          <Search className="h-5 w-5" />
+          <Menu className="h-4 w-4" />
         </Button>
 
-        {/* Notifications */}
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-5 w-5" />
-          <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-red-500" />
-        </Button>
+        {/* App label - dynamic based on active module */}
+        <span className="hidden md:inline-flex text-xs font-semibold text-muted-foreground bg-muted px-2 py-0.5 rounded">
+          EcoSphere: {moduleNav.find((m) => activeModule === m.href)?.label ?? "Dashboard"}
+        </span>
 
-        {/* User dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="relative h-8 gap-2 pl-2 pr-2">
-              <Avatar className="h-7 w-7">
-                {user?.avatar && <AvatarImage src={user.avatar} />}
-                <AvatarFallback className="text-xs">{initials}</AvatarFallback>
-              </Avatar>
-              <span className="hidden text-sm font-medium md:inline-block">
-                {user?.name || "User"}
-              </span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56" align="end" forceMount>
-            <DropdownMenuLabel className="font-normal">
-              <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">{user?.name}</p>
-                <p className="text-xs leading-none text-muted-foreground">
-                  {user?.email}
-                </p>
-              </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <User className="mr-2 h-4 w-4" />
-              Profile
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Settings className="mr-2 h-4 w-4" />
-              Settings
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => logout()}>
-              <LogOut className="mr-2 h-4 w-4" />
-              Log out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {/* Search */}
+        <div className={cn("flex-1", showSearch ? "block" : "hidden md:block")}>
+          <div className="relative max-w-sm">
+            <Search className="absolute left-2.5 top-2 h-3.5 w-3.5 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Search..."
+              className="w-full pl-8 h-7 text-xs"
+            />
+          </div>
+        </div>
+
+        <div className="flex items-center gap-1.5 ml-auto">
+          {/* Search toggle for mobile */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden h-7 w-7"
+            onClick={() => setShowSearch(!showSearch)}
+          >
+            <Search className="h-4 w-4" />
+          </Button>
+
+          {/* Notifications */}
+          <Button variant="ghost" size="icon" className="relative h-7 w-7">
+            <Bell className="h-4 w-4" />
+            <span className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-red-500" />
+          </Button>
+
+          {/* User dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="relative h-7 gap-1.5 pl-1.5 pr-1.5">
+                <Avatar className="h-6 w-6">
+                  {user?.avatar && <AvatarImage src={user.avatar} />}
+                  <AvatarFallback className="text-[10px]">{initials}</AvatarFallback>
+                </Avatar>
+                <span className="hidden text-xs font-medium md:inline-block">
+                  {user?.name || "User"}
+                </span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-52" align="end" forceMount>
+              <DropdownMenuLabel className="font-normal">
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm font-medium leading-none">{user?.name}</p>
+                  <p className="text-xs leading-none text-muted-foreground">
+                    {user?.email}
+                  </p>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link href="/profile">
+                  <User className="mr-2 h-4 w-4" />
+                  Profile
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/settings/departments">
+                  <Settings className="mr-2 h-4 w-4" />
+                  Settings
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => logout()}>
+                <LogOut className="mr-2 h-4 w-4" />
+                Log out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
+
+      {/* Module Navigation Tabs */}
+      <nav className="flex items-center gap-0 overflow-x-auto border-t px-4 scrollbar-none">
+        {moduleNav.map((m) => {
+          const isActive = activeModule === m.href;
+          return (
+            <Link
+              key={m.href}
+              href={m.href}
+              className={cn(
+                "inline-flex items-center whitespace-nowrap px-3 py-2 text-xs font-medium border-b-2 transition-colors",
+                isActive
+                  ? "border-[hsl(var(--sidebar-active))] text-[hsl(var(--sidebar-active))]"
+                  : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground"
+              )}
+            >
+              {m.label}
+            </Link>
+          );
+        })}
+      </nav>
     </header>
   );
 }

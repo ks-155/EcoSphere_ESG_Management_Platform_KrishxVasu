@@ -15,18 +15,14 @@ import {
   Building2,
   Tags,
   FlaskConical,
-  Package,
   Target,
-  FileText,
   Medal,
   Gift,
   BarChart3,
-  TreePine,
   ScrollText,
   ChevronLeft,
   ChevronRight,
   Activity,
-  Swords,
   ClipboardCheck,
   AlertTriangle,
   FileSearch,
@@ -37,90 +33,80 @@ import {
   TicketCheck,
   Award,
   LayoutDashboard,
-  Home,
+  Package,
+  Swords,
+  FileText,
+  TreePine,
   CircleUser,
 } from "lucide-react";
 
 const navGroups = [
   {
     label: "Dashboard",
+    icon: LayoutDashboard,
     items: [
       { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
-      { label: "Environmental", href: "/environmental", icon: Leaf },
-      { label: "Social", href: "/social", icon: Users },
-      { label: "Governance", href: "/governance", icon: Shield },
     ],
   },
   {
-    label: "My Space",
+    label: "Environmental",
+    icon: Leaf,
     items: [
-      { label: "Profile", href: "/profile", icon: CircleUser },
-    ],
-  },
-  {
-    label: "Master Data",
-    items: [
-      { label: "Departments", href: "/settings/departments", icon: Building2 },
-      { label: "Categories", href: "/settings/categories", icon: Tags },
       { label: "Emission Factors", href: "/settings/emission-factors", icon: FlaskConical },
-      { label: "Product Profiles", href: "/settings/product-profiles", icon: Package },
-      { label: "Goals", href: "/settings/goals", icon: Target },
+      { label: "Product ESG Profiles", href: "/settings/product-profiles", icon: Package },
+      { label: "Carbon Transactions", href: "/carbon/entries", icon: Cloud },
+      { label: "Environmental Goals", href: "/settings/goals", icon: Target },
+    ],
+  },
+  {
+    label: "Social",
+    icon: Users,
+    items: [
+      { label: "CSR Activities", href: "/csr/initiatives", icon: Activity },
+      { label: "Employee Participation", href: "/csr/participation", icon: Handshake },
+      { label: "Diversity Dashboard", href: "/social", icon: Users },
+    ],
+  },
+  {
+    label: "Governance",
+    icon: Shield,
+    items: [
       { label: "Policies", href: "/settings/policies", icon: FileText },
-    ],
-  },
-  {
-    label: "Carbon Management",
-    items: [
-      { label: "Carbon Entries", href: "/carbon/entries", icon: Cloud },
-      { label: "Net Zero Target", href: "/carbon/net-zero", icon: TreePine },
-    ],
-  },
-  {
-    label: "CSR & Challenges",
-    items: [
-      { label: "CSR Initiatives", href: "/csr/initiatives", icon: Activity },
-      { label: "CSR Participation", href: "/csr/participation", icon: Handshake },
-      { label: "Challenge Templates", href: "/challenges/templates", icon: Swords },
-      { label: "Submissions", href: "/challenges/submissions", icon: ScrollText },
-    ],
-  },
-  {
-    label: "Audits & Compliance",
-    items: [
-      { label: "Audit Schedules", href: "/audits/schedules", icon: ClipboardCheck },
+      { label: "Policy Acknowledgements", href: "/settings/policy-acknowledgements", icon: ScrollText },
+      { label: "Audits", href: "/audits/schedules", icon: ClipboardCheck },
       { label: "Compliance Issues", href: "/audits/compliance", icon: AlertTriangle },
-      { label: "Audit Reports", href: "/audits/reports", icon: FileSearch },
-    ],
-  },
-  {
-    label: "ESG Scores",
-    items: [
-      { label: "Department Scores", href: "/esg/department-scores", icon: Calculator },
     ],
   },
   {
     label: "Gamification",
+    icon: Trophy,
     items: [
-      { label: "Hub", href: "/gamification", icon: Trophy },
+      { label: "Challenges", href: "/gamification", icon: Swords },
+      { label: "Challenge Participation", href: "/challenges/submissions", icon: ScrollText },
       { label: "Badges", href: "/gamification/badges", icon: Medal },
-      { label: "User Badges", href: "/gamification/user-badges", icon: Award },
       { label: "Rewards", href: "/gamification/rewards", icon: Gift },
-      { label: "Redemptions", href: "/gamification/redemptions", icon: TicketCheck },
       { label: "Leaderboard", href: "/gamification/leaderboard", icon: BarChart3 },
     ],
   },
   {
     label: "Reports",
+    icon: FileBarChart,
     items: [
-      { label: "Custom Builder", href: "/reports/custom", icon: FileBarChart },
+      { label: "Environmental Report", href: "/reports/custom?type=environmental", icon: Leaf },
+      { label: "Social Report", href: "/reports/custom?type=social", icon: Users },
+      { label: "Governance Report", href: "/reports/custom?type=governance", icon: Shield },
+      { label: "ESG Summary", href: "/reports/custom?type=esg", icon: Calculator },
+      { label: "Custom Report Builder", href: "/reports/custom", icon: FileBarChart },
     ],
   },
   {
     label: "Settings",
+    icon: Settings2,
     items: [
-      { label: "ESG Config", href: "/settings/esg-config", icon: Settings2 },
-      { label: "Policy Acknowledgements", href: "/settings/policy-acknowledgements", icon: FileText },
-      { label: "Notifications", href: "/notifications", icon: Bell },
+      { label: "Departments", href: "/settings/departments", icon: Building2 },
+      { label: "Categories", href: "/settings/categories", icon: Tags },
+      { label: "ESG Configuration", href: "/settings/esg-config", icon: Settings2 },
+      { label: "Notification Settings", href: "/notifications", icon: Bell },
     ],
   },
 ];
@@ -137,20 +123,20 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
     <aside
       className={cn(
         "fixed left-0 top-0 z-40 flex h-screen flex-col bg-sidebar text-sidebar-foreground transition-all duration-300",
-        collapsed ? "w-16" : "w-64"
+        collapsed ? "w-16" : "w-60"
       )}
     >
       {/* Logo */}
-      <div className="flex h-16 items-center justify-between px-4">
+      <div className="flex h-14 items-center justify-between px-3 shrink-0">
         {!collapsed && (
           <Link href="/dashboard" className="flex items-center gap-2">
-            <Leaf className="h-6 w-6 text-[hsl(var(--sidebar-active))]" />
-            <span className="text-lg font-bold">EcoSphere</span>
+            <Leaf className="h-5 w-5 text-[hsl(var(--sidebar-active))]" />
+            <span className="text-base font-bold tracking-tight">EcoSphere</span>
           </Link>
         )}
         {collapsed && (
           <Link href="/dashboard" className="mx-auto">
-            <Leaf className="h-6 w-6 text-[hsl(var(--sidebar-active))]" />
+            <Leaf className="h-5 w-5 text-[hsl(var(--sidebar-active))]" />
           </Link>
         )}
       </div>
@@ -158,31 +144,36 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       <Separator className="bg-sidebar-muted" />
 
       {/* Nav */}
-      <nav className="flex-1 overflow-y-auto px-2 py-4 scrollbar-thin">
+      <nav className="flex-1 overflow-y-auto px-2 py-3 scrollbar-thin">
         {navGroups.map((group) => (
-          <div key={group.label} className="mb-4">
+          <div key={group.label} className="mb-3">
             {!collapsed && (
-              <p className="mb-2 px-3 text-xs font-medium uppercase text-sidebar-muted">
+              <p className="mb-1 px-2 text-[10px] font-semibold uppercase tracking-widest text-sidebar-muted">
                 {group.label}
               </p>
             )}
-            <ul className="space-y-1">
+            {collapsed && (
+              <div className="flex justify-center mb-1">
+                <group.icon className="h-3 w-3 text-sidebar-muted" />
+              </div>
+            )}
+            <ul className="space-y-0.5">
               {group.items.map((item) => {
                 const Icon = item.icon;
-                const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+                const isActive = pathname === item.href || pathname.startsWith(item.href.split("?")[0] + "/");
                 return (
                   <li key={`${group.label}-${item.label}`}>
                     <Link
                       href={item.href}
                       className={cn(
-                        "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
+                        "flex items-center gap-2.5 rounded-md px-2 py-1.5 text-xs transition-colors",
                         isActive
-                          ? "bg-[hsl(var(--sidebar-active))] text-white"
+                          ? "bg-[hsl(var(--sidebar-active))] text-white font-medium"
                           : "text-sidebar-foreground/70 hover:bg-sidebar-muted hover:text-sidebar-foreground"
                       )}
                       title={collapsed ? item.label : undefined}
                     >
-                      <Icon className="h-4 w-4 shrink-0" />
+                      <Icon className="h-3.5 w-3.5 shrink-0" />
                       {!collapsed && <span>{item.label}</span>}
                     </Link>
                   </li>
@@ -194,15 +185,15 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       </nav>
 
       {/* Collapse toggle */}
-      <div className="border-t border-sidebar-muted p-2">
+      <div className="border-t border-sidebar-muted p-2 shrink-0">
         <Button
           variant="ghost"
           size="sm"
-          className="w-full justify-center text-sidebar-foreground/70 hover:text-sidebar-foreground"
+          className="w-full justify-center text-sidebar-foreground/70 hover:text-sidebar-foreground text-xs h-7"
           onClick={onToggle}
         >
-          {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-          {!collapsed && <span className="ml-2 text-xs">Collapse</span>}
+          {collapsed ? <ChevronRight className="h-3.5 w-3.5" /> : <ChevronLeft className="h-3.5 w-3.5" />}
+          {!collapsed && <span className="ml-1.5 text-xs">Collapse</span>}
         </Button>
       </div>
     </aside>

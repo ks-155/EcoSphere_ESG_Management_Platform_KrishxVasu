@@ -1,141 +1,385 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { dashboardApi } from "@/lib/api/dashboard";
-import { useAuthStore } from "@/store/auth-store";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PageHeader } from "@/components/shared";
-import { Trophy, Medal, Gift, TrendingUp, Star, Zap } from "lucide-react";
-import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Plus,
+  Trophy,
+  Medal,
+  Star,
+  Zap,
+  Recycle,
+  Car,
+  BarChart3,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
-export default function GamificationHubPage() {
-  const user = useAuthStore((s) => s.user);
+const subTabs = [
+  { id: "challenges", label: "Challenges" },
+  { id: "participation", label: "Challenge Participation" },
+  { id: "badges", label: "Badges" },
+  { id: "rewards", label: "Rewards" },
+  { id: "leaderboard", label: "Leaderboard" },
+];
 
-  const { data: leaderboard } = useQuery({
-    queryKey: ["dashboard", "leaderboard"],
-    queryFn: () => dashboardApi.getLeaderboard(5),
-  });
+const challengeStages = ["Draft", "Active", "Under Review", "Completed", "Archived"];
 
-  const myRank = leaderboard?.find((e) => e.id === user?.id);
+const mockChallenges = [
+  {
+    name: "Sustainability Sprint",
+    xp: 200,
+    difficulty: "Hard",
+    deadline: "07/20",
+    status: "Active",
+    icon: Zap,
+    color: "text-emerald-500",
+    bg: "bg-emerald-500/10",
+  },
+  {
+    name: "Recycle Challenge",
+    xp: 80,
+    difficulty: "Easy",
+    deadline: "07/15",
+    status: "Active",
+    icon: Recycle,
+    color: "text-blue-500",
+    bg: "bg-blue-500/10",
+  },
+  {
+    name: "Commute Green Woe",
+    xp: 120,
+    difficulty: "Medium",
+    deadline: "07/25",
+    status: "Draft",
+    icon: Car,
+    color: "text-amber-500",
+    bg: "bg-amber-500/10",
+  },
+];
+
+const mockBadges = [
+  { name: "Green Beginner", color: "bg-emerald-500/20 text-emerald-600", icon: "🌱" },
+  { name: "Carbon Saver", color: "bg-blue-500/20 text-blue-600", icon: "💧" },
+  { name: "Sustainability Champion", color: "bg-violet-500/20 text-violet-600", icon: "🏆" },
+  { name: "Team Player", color: "bg-amber-500/20 text-amber-600", icon: "🤝" },
+];
+
+const mockLeaderboard = [
+  { rank: 1, name: "Manufacturing Dept", xp: 4820 },
+  { rank: 2, name: "Aditi Rao", xp: 3910 },
+  { rank: 3, name: "Corporate Dept", xp: 3505 },
+  { rank: 4, name: "Karan Shah", xp: 2840 },
+  { rank: 5, name: "Raj Verma", xp: 2610 },
+];
+
+const mockParticipation = [
+  { employee: "Aditi Rao", challenge: "Sustainability Sprint", proof: "photo.jpg", xp: 200, status: "Completed" },
+  { employee: "Karan Shah", challenge: "Recycle Challenge", proof: "video.mp4", xp: 80, status: "Under Review" },
+  { employee: "Meena Kumar", challenge: "Commute Green Woe", proof: "—", xp: 0, status: "Active" },
+];
+
+const mockRewards = [
+  { name: "Gift Voucher ₹500", xpCost: 500, available: 20, status: "Active" },
+  { name: "Extra Leave Day", xpCost: 1000, available: 10, status: "Active" },
+  { name: "Eco Hamper", xpCost: 750, available: 15, status: "Active" },
+];
+
+function getStatusColor(status: string) {
+  switch (status.toLowerCase()) {
+    case "active": return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400";
+    case "draft": return "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400";
+    case "under review": return "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400";
+    case "completed": return "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400";
+    case "archived": return "bg-muted text-muted-foreground";
+    default: return "bg-muted text-muted-foreground";
+  }
+}
+
+export default function GamificationPage() {
+  const [activeTab, setActiveTab] = useState("challenges");
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Gamification Hub"
-        description="Track your progress, earn XP, and climb the leaderboard"
-      />
-
-      {/* User Progress Card */}
-      <Card className="bg-gradient-to-br from-primary/10 to-primary/5">
-        <CardContent className="pt-6">
-          <div className="flex items-center gap-6">
-            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/20">
-              <Trophy className="h-10 w-10 text-primary" />
-            </div>
-            <div className="space-y-1">
-              <h2 className="text-2xl font-bold">{user?.name ?? "Employee"}</h2>
-              <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                <span className="flex items-center gap-1">
-                  <Zap className="h-4 w-4 text-yellow-500" />
-                  <strong>{user?.xp ?? 0}</strong> XP
-                </span>
-                <span className="flex items-center gap-1">
-                  <Medal className="h-4 w-4 text-blue-500" />
-                  Rank #{myRank?.rank ?? "-"}
-                </span>
-                <span className="flex items-center gap-1">
-                  <Star className="h-4 w-4 text-purple-500" />
-                  {myRank?.badgeCount ?? 0} Badges
-                </span>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Quick Stats */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Link href="/gamification/badges">
-          <Card className="hover:border-primary/50 transition-colors cursor-pointer">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Badges</CardTitle>
-              <Medal className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">{myRank?.badgeCount ?? 0}</div>
-              <p className="text-xs text-muted-foreground">Badges earned</p>
-            </CardContent>
-          </Card>
-        </Link>
-        <Link href="/gamification/rewards">
-          <Card className="hover:border-primary/50 transition-colors cursor-pointer">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Rewards Store</CardTitle>
-              <Gift className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">{user?.xp ?? 0}</div>
-              <p className="text-xs text-muted-foreground">Available XP to redeem</p>
-            </CardContent>
-          </Card>
-        </Link>
-        <Link href="/challenges/templates">
-          <Card className="hover:border-primary/50 transition-colors cursor-pointer">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Challenges</CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">
-                {leaderboard?.length ?? 0}
-              </div>
-              <p className="text-xs text-muted-foreground">Active challenges available</p>
-            </CardContent>
-          </Card>
-        </Link>
+    <div className="space-y-4">
+      {/* Page header */}
+      <div>
+        <h1 className="text-lg font-semibold">Gamification: Challenges, Badges &amp; Leaderboard</h1>
+        <p className="text-xs text-muted-foreground">
+          Drive employee engagement through challenges, badges, rewards and leaderboards
+        </p>
       </div>
 
-      {/* Top 5 Leaderboard Preview */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Top Performers</CardTitle>
-          <Link href="/gamification/leaderboard" className="text-sm text-primary hover:underline">
-            View Full Leaderboard →
-          </Link>
-        </CardHeader>
-        <CardContent>
-          {leaderboard && leaderboard.length > 0 ? (
-            <div className="space-y-3">
-              {leaderboard.map((emp, i) => (
-                <div key={emp.id} className="flex items-center justify-between rounded-lg border p-3">
-                  <div className="flex items-center gap-3">
-                    <span
-                      className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
-                        i === 0
-                          ? "bg-yellow-100 text-yellow-800"
-                          : i === 1
-                          ? "bg-gray-100 text-gray-800"
-                          : i === 2
-                          ? "bg-orange-100 text-orange-800"
-                          : "bg-muted text-muted-foreground"
-                      }`}
-                    >
-                      {i + 1}
-                    </span>
-                    <div>
-                      <p className="text-sm font-medium">{emp.name}</p>
-                      <p className="text-xs text-muted-foreground">{emp.badgeCount} badges</p>
+      {/* Sub-tabs */}
+      <div className="flex gap-0 border-b overflow-x-auto scrollbar-none">
+        {subTabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={cn(
+              "px-4 py-2 text-xs font-medium whitespace-nowrap border-b-2 transition-colors",
+              activeTab === tab.id
+                ? "border-[hsl(var(--sidebar-active))] text-[hsl(var(--sidebar-active))] bg-[hsl(var(--sidebar-active))]/5"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            )}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Challenges */}
+      {activeTab === "challenges" && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Button size="sm" className="h-7 text-xs gap-1">
+              <Plus className="h-3 w-3" /> New Challenge
+            </Button>
+          </div>
+
+          {/* Stage pipeline */}
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {challengeStages.map((stage) => (
+              <div
+                key={stage}
+                className={cn(
+                  "px-3 py-1 rounded text-[10px] font-medium whitespace-nowrap",
+                  stage === "Active" ? "bg-emerald-500 text-white" :
+                  stage === "Under Review" ? "bg-blue-500 text-white" :
+                  stage === "Completed" ? "bg-violet-500 text-white" :
+                  "bg-muted text-muted-foreground"
+                )}
+              >
+                {stage}
+              </div>
+            ))}
+          </div>
+
+          {/* Challenge cards */}
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+            {mockChallenges.map((ch) => {
+              const Icon = ch.icon;
+              return (
+                <Card key={ch.name} className="hover:shadow-md transition-shadow">
+                  <CardContent className="p-4">
+                    <div className="flex items-start gap-3 mb-2">
+                      <div className={cn("h-8 w-8 rounded-lg flex items-center justify-center shrink-0", ch.bg)}>
+                        <Icon className={cn("h-4 w-4", ch.color)} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold leading-tight">{ch.name}</p>
+                        <p className="text-[10px] text-muted-foreground">
+                          XP: {ch.xp} • {ch.difficulty}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground">Deadline {ch.deadline}</p>
+                      </div>
                     </div>
-                  </div>
-                  <span className="text-sm font-semibold">{emp.xp} XP</span>
+                    <div className="flex items-center justify-between">
+                      <span className={cn("px-2 py-0.5 rounded text-[10px] font-medium", getStatusColor(ch.status))}>
+                        {ch.status}
+                      </span>
+                      <Button size="sm" className="h-6 text-[10px] px-3 bg-orange-500 hover:bg-orange-600 text-white">
+                        Join Challenge
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+
+          {/* Badges + Leaderboard side by side */}
+          <div className="grid gap-4 lg:grid-cols-2">
+            <Card>
+              <CardHeader className="pb-2 pt-3 px-4">
+                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  <Medal className="h-3.5 w-3.5 text-muted-foreground" /> Badge Gallery
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="px-4 pb-4">
+                <div className="grid grid-cols-2 gap-2">
+                  {mockBadges.map((badge) => (
+                    <div
+                      key={badge.name}
+                      className={cn("flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium", badge.color)}
+                    >
+                      <span>{badge.icon}</span>
+                      {badge.name}
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-center text-muted-foreground py-8">No leaderboard data yet</p>
-          )}
-        </CardContent>
-      </Card>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2 pt-3 px-4">
+                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  <BarChart3 className="h-3.5 w-3.5 text-muted-foreground" /> Leaderboard
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="px-4 pb-4">
+                <div className="space-y-1">
+                  <div className="grid grid-cols-3 text-[10px] text-muted-foreground font-medium mb-1">
+                    <span>Rank</span>
+                    <span>Employee/Dept</span>
+                    <span className="text-right">XP</span>
+                  </div>
+                  {mockLeaderboard.slice(0, 3).map((e) => (
+                    <div key={e.rank} className="grid grid-cols-3 text-xs py-1 border-b last:border-0">
+                      <span className="font-bold text-muted-foreground">{e.rank}</span>
+                      <span>{e.name}</span>
+                      <span className="text-right font-medium">{e.xp.toLocaleString()}</span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      )}
+
+      {/* Challenge Participation */}
+      {activeTab === "participation" && (
+        <div className="space-y-3">
+          <Card>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs">
+                  <thead className="border-b bg-muted/40">
+                    <tr>
+                      <th className="px-4 py-2.5 text-left font-medium text-muted-foreground">Employee</th>
+                      <th className="px-4 py-2.5 text-left font-medium text-muted-foreground">Challenge</th>
+                      <th className="px-4 py-2.5 text-left font-medium text-muted-foreground">Proof</th>
+                      <th className="px-4 py-2.5 text-right font-medium text-muted-foreground">XP Earned</th>
+                      <th className="px-4 py-2.5 text-left font-medium text-muted-foreground">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {mockParticipation.map((p, i) => (
+                      <tr key={i} className="border-b last:border-0 hover:bg-muted/30">
+                        <td className="px-4 py-2.5 font-medium">{p.employee}</td>
+                        <td className="px-4 py-2.5">{p.challenge}</td>
+                        <td className="px-4 py-2.5 text-muted-foreground">{p.proof}</td>
+                        <td className="px-4 py-2.5 text-right">{p.xp}</td>
+                        <td className="px-4 py-2.5">
+                          <span className={cn("px-2 py-0.5 rounded text-[10px] font-medium", getStatusColor(p.status))}>
+                            {p.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Badges */}
+      {activeTab === "badges" && (
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <Button size="sm" className="h-7 text-xs gap-1">
+              <Plus className="h-3 w-3" /> New Badge
+            </Button>
+          </div>
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            {mockBadges.map((badge) => (
+              <Card key={badge.name} className="hover:shadow-md transition-shadow">
+                <CardContent className="p-4 flex flex-col items-center gap-2">
+                  <div className={cn("h-12 w-12 rounded-full flex items-center justify-center text-2xl", badge.color)}>
+                    {badge.icon}
+                  </div>
+                  <p className="text-xs font-semibold text-center">{badge.name}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Rewards */}
+      {activeTab === "rewards" && (
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <Button size="sm" className="h-7 text-xs gap-1">
+              <Plus className="h-3 w-3" /> New Reward
+            </Button>
+          </div>
+          <Card>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs">
+                  <thead className="border-b bg-muted/40">
+                    <tr>
+                      <th className="px-4 py-2.5 text-left font-medium text-muted-foreground">Reward</th>
+                      <th className="px-4 py-2.5 text-right font-medium text-muted-foreground">XP Cost</th>
+                      <th className="px-4 py-2.5 text-right font-medium text-muted-foreground">Available</th>
+                      <th className="px-4 py-2.5 text-left font-medium text-muted-foreground">Status</th>
+                      <th className="px-4 py-2.5 text-left font-medium text-muted-foreground">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {mockRewards.map((r, i) => (
+                      <tr key={i} className="border-b last:border-0 hover:bg-muted/30">
+                        <td className="px-4 py-2.5 font-medium">{r.name}</td>
+                        <td className="px-4 py-2.5 text-right">{r.xpCost} XP</td>
+                        <td className="px-4 py-2.5 text-right">{r.available}</td>
+                        <td className="px-4 py-2.5">
+                          <span className={cn("px-2 py-0.5 rounded text-[10px] font-medium", getStatusColor(r.status))}>
+                            {r.status}
+                          </span>
+                        </td>
+                        <td className="px-4 py-2.5">
+                          <Button size="sm" className="h-5 text-[10px] px-2">Redeem</Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Leaderboard */}
+      {activeTab === "leaderboard" && (
+        <div className="space-y-3">
+          <Card>
+            <CardHeader className="pb-2 pt-3 px-4">
+              <CardTitle className="text-sm font-medium flex items-center gap-2">
+                <Trophy className="h-3.5 w-3.5 text-amber-500" /> Full Leaderboard
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs">
+                  <thead className="border-b bg-muted/40">
+                    <tr>
+                      <th className="px-4 py-2.5 text-left font-medium text-muted-foreground">Rank</th>
+                      <th className="px-4 py-2.5 text-left font-medium text-muted-foreground">Employee / Dept</th>
+                      <th className="px-4 py-2.5 text-right font-medium text-muted-foreground">XP</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {mockLeaderboard.map((e) => (
+                      <tr key={e.rank} className="border-b last:border-0 hover:bg-muted/30">
+                        <td className="px-4 py-2.5 font-bold text-muted-foreground">
+                          {e.rank === 1 ? "🥇" : e.rank === 2 ? "🥈" : e.rank === 3 ? "🥉" : `#${e.rank}`}
+                        </td>
+                        <td className="px-4 py-2.5 font-medium">{e.name}</td>
+                        <td className="px-4 py-2.5 text-right">{e.xp.toLocaleString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }
